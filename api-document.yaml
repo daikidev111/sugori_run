@@ -5,8 +5,7 @@ info:
     <b>CA Tech Dojo Online API仕様</b><br>
     まずはこのAPI仕様に沿って機能を実装してみましょう。<br><br>
     なお、実装に際してランキング機能の実装が必要となります。<br>
-    ランキングの実装にMySQLではなくredisを利用することも可能です。<br>
-    MySQLのORDER BYを利用するか、redisのZSETを利用がおすすめです。
+    ランキングの実装に関して基礎課題ではMySQLを利用してください。
   version: 1.0.0
 servers:
   - url: http://localhost:8080/
@@ -14,7 +13,7 @@ tags:
   - name: setting
     description: 設定関連API
   - name: user
-    description: ユーザ関連APIs
+    description: ユーザ関連API
   - name: game
     description: インゲーム関連API
   - name: gacha
@@ -185,7 +184,8 @@ paths:
       description: |
         指定した順位から一定数の順位までのランキング情報を取得します。<br>
         例えば「サーバ側での1回あたりのランキング取得件数設定」が10で、「rankパラメータ」の指定が1だった場合は1位〜10位を、「rankパラメータ」の指定が5だった場合は5位〜14位を返却します。<br>
-        基礎課題では同率順位は考慮しないものとします。
+        基礎課題ではMySQLのクエリを利用した順位取得処理を実装し、同率順位は考慮せず、同じスコアだった場合はユーザーIDの昇順で順位を決定するものとします。<br>
+        (redisを利用したランキングの仕組みは発展課題で任意で取り組んでください。)
       parameters:
         - name: x-token
           in: header

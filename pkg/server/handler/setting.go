@@ -7,9 +7,6 @@ import (
 	"22dojo-online/pkg/http/response"
 )
 
-type SettingGetResponse struct {
-}
-
 // HandleSettingGet ゲーム設定情報取得処理
 func HandleSettingGet() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
