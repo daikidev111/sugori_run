@@ -7,6 +7,8 @@ CA Tech Dojo Online で利用するAPIベース実装リポジトリ
 CA Tech Dojo Onlineでは「スゴリらん！」というゲームのAPI実装を通してGo言語を使用したバックエンド開発のノウハウを学んでいきます。<br>
 「スゴリらん！」は8つのAPIを必要とし、そのうち7つのAPIを期間中に実装していきます。<br>
 
+課題の具体的な内容は[こちら](./TASKS.md)。
+
 【ゲーム画面】
 ![ゲーム画面](./img/game_view.png)
 
@@ -53,7 +55,7 @@ PHPMyAdminサーバ起動後以下のURLからアクセスすることができ�
 PHPMyAdmin: <http://localhost:4000/>
 
 #### MySQLWorkbenchの設定
-※ dockerの環境設定が上手くいかなかった場合に利用推奨
+※ dockerの環境設定が上手くいかなかった場合に利用推奨<br>
 Download: https://www.mysql.com/jp/products/workbench/
 
 MySQLへの接続設定をします。
