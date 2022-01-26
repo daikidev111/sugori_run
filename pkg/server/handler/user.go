@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -78,7 +77,7 @@ func HandleUserGet() http.HandlerFunc {
 		ctx := request.Context()
 		userID := dcontext.GetUserIDFromContext(ctx)
 		if userID == "" {
-			log.Println(errors.New("userID is empty"))
+			log.Println("userID is empty")
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
@@ -92,7 +91,7 @@ func HandleUserGet() http.HandlerFunc {
 			return
 		}
 		if user == nil {
-			log.Println(errors.New("user not found"))
+			log.Println("user not found")
 			response.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
 			return
 		}
@@ -130,7 +129,7 @@ func HandleUserUpdate() http.HandlerFunc {
 		ctx := request.Context()
 		userID := dcontext.GetUserIDFromContext(ctx)
 		if userID == "" {
-			log.Println(errors.New("userID is empty"))
+			log.Println("userID is empty")
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
@@ -144,7 +143,7 @@ func HandleUserUpdate() http.HandlerFunc {
 			return
 		}
 		if user == nil {
-			log.Println(errors.New("user not found"))
+			log.Println("user not found")
 			response.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
 			return
 		}
