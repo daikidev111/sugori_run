@@ -9,7 +9,6 @@ import (
 
 // Serve HTTPサーバを起動する
 func Serve(addr string) {
-
 	/* ===== URLマッピングを行う ===== */
 	http.HandleFunc("/setting/get", get(handler.HandleSettingGet()))
 	http.HandleFunc("/user/create", post(handler.HandleUserCreate()))
@@ -42,7 +41,6 @@ func post(apiFunc http.HandlerFunc) http.HandlerFunc {
 // httpMethod 指定したHTTPメソッドでAPIの処理を実行する
 func httpMethod(apiFunc http.HandlerFunc, method string) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-
 		// CORS対応
 		writer.Header().Add("Access-Control-Allow-Origin", "*")
 		writer.Header().Add("Access-Control-Allow-Headers", "Content-Type,Accept,Origin,x-token")
@@ -54,7 +52,9 @@ func httpMethod(apiFunc http.HandlerFunc, method string) http.HandlerFunc {
 		// 指定のHTTPメソッドでない場合はエラー
 		if request.Method != method {
 			writer.WriteHeader(http.StatusMethodNotAllowed)
-			writer.Write([]byte("Method Not Allowed"))
+			if _, err := writer.Write([]byte("Method Not Allowed")); err != nil {
+				log.Println(err)
+			}
 			return
 		}
 

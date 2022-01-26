@@ -16,7 +16,6 @@ import (
 // HandleUserCreate ユーザ情報作成処理
 func HandleUserCreate() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-
 		// リクエストBodyから更新後情報を取得
 		var requestBody userCreateRequest
 		if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
@@ -72,7 +71,6 @@ type userCreateResponse struct {
 // HandleUserGet ユーザ情報取得処理
 func HandleUserGet() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-
 		// Contextから認証済みのユーザIDを取得
 		ctx := request.Context()
 		userID := dcontext.GetUserIDFromContext(ctx)
@@ -116,7 +114,6 @@ type userGetResponse struct {
 // HandleUserUpdate ユーザ情報更新処理
 func HandleUserUpdate() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-
 		// リクエストBodyから更新後情報を取得
 		var requestBody userUpdateRequest
 		if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
