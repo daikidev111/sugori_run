@@ -4,9 +4,6 @@ on:
   pull_request:
     paths:
       - '**.go'
-  push:
-    paths:
-      - '**.go'
 jobs:
   golangci-lint:
     runs-on: ubuntu-latest
