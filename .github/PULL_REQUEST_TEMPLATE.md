@@ -10,6 +10,4 @@
 (例 A_才波:User APIの実装)
 
 - [ ] マージ先のブランチをmasterから自分のブランチに変更しましたか？<br>
-(feature/${名前} ← feature/${名前}/hoge)
-
-- [ ] go fmtでフォーマットしましたか？
+(feature/${名前}/master ← feature/${名前}/hoge)
