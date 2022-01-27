@@ -17,7 +17,9 @@ func Success(writer http.ResponseWriter, response interface{}) {
 		InternalServerError(writer, "marshal error")
 		return
 	}
-	writer.Write(data)
+	if _, err := writer.Write(data); err != nil {
+		log.Println(err)
+	}
 }
 
 // BadRequest HTTPコード:400 BadRequestを処理する
@@ -38,7 +40,10 @@ func httpError(writer http.ResponseWriter, code int, message string) {
 	})
 	writer.WriteHeader(code)
 	if data != nil {
-		writer.Write(data)
+		if _, err := writer.Write(data); err != nil {
+			log.Println(err)
+			return
+		}
 	}
 }
 

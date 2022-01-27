@@ -32,6 +32,24 @@ SwaggerUI: <http://localhost:3000/> <br>
 - https://bugzilla.mozilla.org/show_bug.cgi?id=903966
 
 # 事前準備
+## goimportsとgolangci-lintのinstall
+自分の書いたソースコードがプロジェクトのコード規約に則って記述されているか確認したり、整形したりするツールとして**gofmt** 、**goimports**、**golangci-lint**を使用します。<br>
+**gofmt**はgoの標準コマンドであるため、goの環境構築を完了させていれば使用できるようになっていると思います。<br>
+**goimports**、**golangci-lint**は別途installする必要があるため、以下のコマンドを実行しましょう。
+```
+$ make local-install
+```
+コードを整形するときは
+```
+$ make fmt
+```
+コード規約に則っているか確認するときは
+```
+$ make lint
+```
+を実行して開発を進めましょう。<br>
+それぞれのコマンドが何を行っているか知りたいときはこのリポジトリ内のMakefileを見てみましょう。
+
 ## docker-composeを利用したMySQLとRedisの準備
 ### MySQL
 MySQLはリレーショナルデータベースの1つです。
