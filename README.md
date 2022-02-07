@@ -27,10 +27,6 @@ SwaggerUIサーバ起動後以下のURLからSwaggerUIへアクセスするこ�
 SwaggerUI: <http://localhost:3000/> <br> 
 定義ファイル: `./api-document.yaml`<br>
 
-※ Firefoxはブラウザ仕様により上記サイトからlocalhostへ向けた通信を許可していないので動作しません
-- https://bugzilla.mozilla.org/show_bug.cgi?id=1488740
-- https://bugzilla.mozilla.org/show_bug.cgi?id=903966
-
 # 事前準備
 ## goimportsとgolangci-lintのinstall
 自分の書いたソースコードがプロジェクトのコード規約に則って記述されているか確認したり、整形したりするツールとして**gofmt** 、**goimports**、**golangci-lint**を使用します。<br>
@@ -122,6 +118,47 @@ $ docker-compose up redis
 ```
 $ go run ./cmd/main.go
 ```
+
+## ローカル環境のAPIを使用したゲームプレイ方法
+自身が開発しているローカルのAPIを使用して、実際にゲームをプレイする方法は二つあります。場合によって使い分けてください。
+
+**どうして二つあるの？**
+今回使用するゲームのクライアントは、このリポジトリには含まれておらず、インターネット上に公開されています。インターネット上に公開されているアプリケーションが公開されている場所以外にアクセスしようとすると、セキュリティ上の問題があるため一部のブラウザではアクセスをブロックする設定になっています。(CORS)
+
+それを防ぐために、インターネット上にあるものをあたかもローカルに存在するように見せるproxyを用意しました。
+
+### docker-compose up proxyでプレイ
+Dockerを利用してプレイする方法です。ブラウザに左右されずに動作させることができます。
+
+```
+$ docker-compose up -d proxy
+
+// APIローカルも起動させる必要があります。
+$ go run ./cmd/main.go
+```
+
+ブラウザから下記URLにアクセスしてください。
+[http://localhost:3010/app](http://localhost:3010/app)
+
+ID・パスワードはともに `ca-tech-dojo` です。
+API接続先には `http://localhost:3010` と入力します。(ブラウザ直接利用の場合と異なるので注意！)
+
+### ブラウザから直接プレイ
+Dockerがうまく動かない場合には直接プレイすることもできます。ただし、ChromeやEdgeは利用できません。
+
+- macOSユーザーの場合: Safari or Firefox
+- Windowsユーザーの場合: Firefox
+
+```
+// APIローカルは起動させる必要があります
+$ go run ./cmd/main.go
+```
+
+ブラウザから下記URLにアクセスしてください。
+[http://13.114.176.9/](http://13.114.176.9/)
+
+ID・パスワードはともに `ca-tech-dojo` です。
+API接続先には `http://localhost:8080` と入力します。(proxy利用の場合と異なるので注意！)
 
 ## ビルド方法
 作成したAPIを実際にをサーバ上にデプロイする場合は、<br>

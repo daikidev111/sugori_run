@@ -38,6 +38,13 @@ services:
     ports:
       - 127.0.0.1:3000:8080
 
+  proxy:
+    image: nginx:latest
+    volumes:
+    - ./docker/proxy.conf:/etc/nginx/conf.d/default.conf
+    ports:
+    - "3010:3010"
+
 volumes:
   db-data:
     driver: local
