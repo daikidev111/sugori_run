@@ -19,11 +19,9 @@ type User struct {
 // InsertUser データベースをレコードを登録する
 func InsertUser(record *User) error {
 	// TODO: usersテーブルへのレコードの登録を行うSQLを入力する
-	stmt, err := db.Conn.Prepare("")
-	if err != nil {
-		return err
-	}
-	_, err = stmt.Exec(record.ID, record.AuthToken, record.Name, record.HighScore, record.Coin)
+	_, err := db.Conn.Exec(
+		"",
+		record.ID, record.AuthToken, record.Name, record.HighScore, record.Coin)
 	return err
 }
 
@@ -44,11 +42,9 @@ func SelectUserByPrimaryKey(userID string) (*User, error) {
 // UpdateUserByPrimaryKey 主キーを条件にレコードを更新する
 func UpdateUserByPrimaryKey(record *User) error {
 	// TODO: idを条件に指定した値でnameカラムの値を更新するSQLを入力する
-	stmt, err := db.Conn.Prepare("")
-	if err != nil {
-		return err
-	}
-	_, err = stmt.Exec(record.Name, record.ID)
+	_, err := db.Conn.Exec(
+		"",
+		record.Name, record.ID)
 	return err
 }
 
