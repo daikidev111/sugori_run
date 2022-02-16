@@ -37,4 +37,14 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if err := Conn.Ping(); err != nil {
+		log.Fatalf("can't connect to mysql server. "+
+			"MYSQL_USER=%s, "+
+			"MYSQL_PASSWORD=%s, "+
+			"MYSQL_HOST=%s, "+
+			"MYSQL_PORT=%s, "+
+			"MYSQL_DATABASE=%s, "+
+			"error=%+v",
+			user, password, host, port, database, err)
+	}
 }
