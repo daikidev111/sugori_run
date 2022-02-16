@@ -80,7 +80,7 @@ func HandleUserGet() http.HandlerFunc {
 			return
 		}
 
-		// TODO: ユーザデータの取得処理を実装
+		// TODO: ユーザデータの取得処理を実装 (ヒント: model.SelectUserByPrimaryKeyを使用する)
 		var user *model.User
 		var err error
 		if err != nil {
@@ -131,7 +131,7 @@ func HandleUserUpdate() http.HandlerFunc {
 			return
 		}
 
-		// TODO: ユーザデータの取得処理と存在チェックを実装
+		// TODO: ユーザデータの取得処理と存在チェックを実装 (ヒント: model.SelectUserByPrimaryKeyを使用する)
 		var user *model.User
 		var err error
 		if err != nil {
@@ -145,7 +145,7 @@ func HandleUserUpdate() http.HandlerFunc {
 			return
 		}
 
-		// TODO: userテーブルの更新処理を実装
+		// TODO: userテーブルの更新処理を実装 (ヒント: model.UpdateUserByPrimaryKeyを使用する)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
