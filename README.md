@@ -97,7 +97,8 @@ $ export MYSQL_USER=root \
     MYSQL_DATABASE=dojo_api
 ```
 
-Windowsの場合
+Windowsの場合<br>
+※ それぞれの環境によって環境変数を設定するコマンドが異なる場合があるので注意
 ```
 $ SET MYSQL_USER=root
 $ SET MYSQL_PASSWORD=ca-tech-dojo
