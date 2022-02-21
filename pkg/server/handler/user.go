@@ -84,7 +84,6 @@ func HandleUserGet() http.HandlerFunc {
 		var user *model.User
 		var err error
 
-		//?!
 		user, err = model.SelectUserByPrimaryKey(userID)
 
 		if err != nil {
