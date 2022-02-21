@@ -20,7 +20,7 @@ type User struct {
 func InsertUser(record *User) error {
 	// TODO: usersテーブルへのレコードの登録を行うSQLを入力する
 	_, err := db.Conn.Exec(
-		"",
+		"INSERT INTO user(id,auth_token,name,high_score,coin) VALUES (?,?,?,?,?)",
 		record.ID, record.AuthToken, record.Name, record.HighScore, record.Coin)
 	return err
 }
