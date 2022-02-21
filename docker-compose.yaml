@@ -7,6 +7,7 @@ services:
       - 6379:6379
 
   mysql:
+    platform: linux/x86_64
     image: mysql:5.7
     ports:
       - 3306:3306
@@ -30,6 +31,7 @@ services:
       - 4000:80
 
   swagger-ui:
+    platform: linux/amd64
     image: swaggerapi/swagger-ui:latest
     environment:
       SWAGGER_JSON: /api/api-document.yaml
