@@ -5,17 +5,35 @@ services:
     image: redis:5.0
     ports:
       - 6379:6379
+  dojo:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ca-tech-dojo
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: dojo_api
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./:/go/src/github.com/22dojo-online"
+    depends_on:
+      - mysql
 
   mysql:
     image: mysql:5.7
-    ports:
-      - 3306:3306
-    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    expose:
+      - "3306"
+    restart: always
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./db/init:/docker-entrypoint-initdb.d
       - db-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "ca-tech-dojo"
+      MYSQL_DATABASE: dojo_api
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

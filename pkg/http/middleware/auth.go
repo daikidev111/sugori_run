@@ -25,7 +25,6 @@ func Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		// TODO: データベースから認証トークンに紐づくユーザの情報を取得
 		user, err := model.SelectUserByAuthToken(token)
 		if err != nil {
 			log.Println(err)
