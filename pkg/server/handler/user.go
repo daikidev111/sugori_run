@@ -83,6 +83,7 @@ func HandleUserGet() http.HandlerFunc {
 		// TODO: ユーザデータの取得処理を実装 (ヒント: model.SelectUserByPrimaryKeyを使用する)
 		var user *model.User
 		var err error
+		user, err = model.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
@@ -134,6 +135,7 @@ func HandleUserUpdate() http.HandlerFunc {
 		// TODO: ユーザデータの取得処理と存在チェックを実装 (ヒント: model.SelectUserByPrimaryKeyを使用する)
 		var user *model.User
 		var err error
+		user, err = model.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
@@ -144,8 +146,9 @@ func HandleUserUpdate() http.HandlerFunc {
 			response.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
 			return
 		}
-
+		user.Name = requestBody.Name
 		// TODO: userテーブルの更新処理を実装 (ヒント: model.UpdateUserByPrimaryKeyを使用する)
+		err = model.UpdateUserByPrimaryKey(user)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
