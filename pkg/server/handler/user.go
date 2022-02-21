@@ -78,7 +78,7 @@ func HandleUserGet() http.HandlerFunc {
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
-		user,err := model.SelectUserByPrimaryKey(userID)
+		user, err := model.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
@@ -127,7 +127,7 @@ func HandleUserUpdate() http.HandlerFunc {
 			return
 		}
 
-		user,err := model.SelectUserByPrimaryKey(userID)
+		user, err := model.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
@@ -141,7 +141,7 @@ func HandleUserUpdate() http.HandlerFunc {
 
 		user.Name = requestBody.Name
 
-		if err = model.UpdateUserByPrimaryKey(user);err != nil {
+		if err = model.UpdateUserByPrimaryKey(user); err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
 			return

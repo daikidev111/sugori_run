@@ -1,9 +1,10 @@
 package server
 
 import (
-	"22dojo-online/pkg/http/middleware"
 	"log"
 	"net/http"
+
+	"22dojo-online/pkg/http/middleware"
 
 	"22dojo-online/pkg/server/handler"
 )

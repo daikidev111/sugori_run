@@ -26,7 +26,6 @@ func InsertUser(record *User) error {
 
 // SelectUserByAuthToken auth_tokenを条件にレコードを取得する
 func SelectUserByAuthToken(authToken string) (*User, error) {
-
 	row := db.Conn.QueryRow("SELECT * FROM user WHERE auth_token = ?", authToken)
 	return convertToUser(row)
 }
