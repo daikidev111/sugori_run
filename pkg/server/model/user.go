@@ -33,14 +33,12 @@ func SelectUserByAuthToken(authToken string) (*User, error) {
 
 // SelectUserByPrimaryKey 主キーを条件にレコードを取得する
 func SelectUserByPrimaryKey(userID string) (*User, error) {
-	// TODO: idを条件にSELECTを行うSQLを第1引数に入力する
 	row := db.Conn.QueryRow("SELECT * FROM user WHERE id = ?", userID)
 	return convertToUser(row)
 }
 
 // UpdateUserByPrimaryKey 主キーを条件にレコードを更新する
 func UpdateUserByPrimaryKey(record *User) error {
-	// TODO: idを条件に指定した値でnameカラムの値を更新するSQLを入力する
 	_, err := db.Conn.Exec(
 		"UPDATE user SET name = ? WHERE id = ?",
 		record.Name, record.ID)

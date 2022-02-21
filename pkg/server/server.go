@@ -1,6 +1,7 @@
 package server
 
 import (
+	"22dojo-online/pkg/http/middleware"
 	"log"
 	"net/http"
 
@@ -16,9 +17,9 @@ func Serve(addr string) {
 	// TODO: 認証を行うmiddlewareを追加する
 	// middlewareは 22dojo-online/pkg/http/middleware パッケージを利用する
 	http.HandleFunc("/user/get",
-		get(handler.HandleUserGet()))
+		get(middleware.Authenticate(handler.HandleUserGet())))
 	http.HandleFunc("/user/update",
-		post(handler.HandleUserUpdate()))
+		post(middleware.Authenticate(handler.HandleUserUpdate())))
 
 	/* ===== サーバの起動 ===== */
 	log.Println("Server running...")
