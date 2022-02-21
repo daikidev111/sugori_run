@@ -14,3 +14,7 @@ fmt:
 .PHONY: lint
 lint:
 	golangci-lint run -v cmd/... pkg/...
+
+.PHONY: dev
+dev:
+	docker compose up --build
