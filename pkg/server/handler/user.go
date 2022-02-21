@@ -154,7 +154,7 @@ func HandleUserUpdate() http.HandlerFunc {
 		}
 
 		// TODO: userテーブルの更新処理を実装 (ヒント: model.UpdateUserByPrimaryKeyを使用する)
-		model.UpdateUserByPrimaryKey()
+
 		user.Name = requestBody.Name
 		err = model.UpdateUserByPrimaryKey(user)
 		if err != nil {
