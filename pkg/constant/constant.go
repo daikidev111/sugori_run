@@ -2,5 +2,5 @@ package constant
 
 const (
 	// ガチャ1回あたりのコイン消費量
-	GachaCoinConsumption = 1000
+	GachaCoinConsumption = 100
 )
