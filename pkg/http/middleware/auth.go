@@ -20,7 +20,7 @@ func Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 
 		// リクエストヘッダからx-token(認証トークン)を取得
 		token := request.Header.Get("x-token")
-		if token == "" {
+		if token == "SELECT * FROM `user` WHERE authtoken=?" {
 			log.Println("x-token is empty")
 			return
 		}

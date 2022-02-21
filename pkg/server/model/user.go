@@ -20,7 +20,7 @@ type User struct {
 func InsertUser(record *User) error {
 	// TODO: usersテーブルへのレコードの登録を行うSQLを入力する
 	_, err := db.Conn.Exec(
-		"",
+		"INSERT INTO `user` (id, auth_token, name, high_score, coin) VALUES (?, ?, ?, ?, ?)",
 		record.ID, record.AuthToken, record.Name, record.HighScore, record.Coin)
 	return err
 }
@@ -28,14 +28,14 @@ func InsertUser(record *User) error {
 // SelectUserByAuthToken auth_tokenを条件にレコードを取得する
 func SelectUserByAuthToken(authToken string) (*User, error) {
 	// TODO: auth_tokenを条件にSELECTを行うSQLを第1引数に入力する
-	row := db.Conn.QueryRow("", authToken)
+	row := db.Conn.QueryRow("SELECT * FROM `user` WHERE auth_token = ?", authToken)
 	return convertToUser(row)
 }
 
 // SelectUserByPrimaryKey 主キーを条件にレコードを取得する
 func SelectUserByPrimaryKey(userID string) (*User, error) {
 	// TODO: idを条件にSELECTを行うSQLを第1引数に入力する
-	row := db.Conn.QueryRow("", userID)
+	row := db.Conn.QueryRow("SELECT * FROM `user` WHERE id = ?", userID)
 	return convertToUser(row)
 }
 
@@ -43,7 +43,7 @@ func SelectUserByPrimaryKey(userID string) (*User, error) {
 func UpdateUserByPrimaryKey(record *User) error {
 	// TODO: idを条件に指定した値でnameカラムの値を更新するSQLを入力する
 	_, err := db.Conn.Exec(
-		"",
+		"UPDATE `user` SET name=? WHERE id=?",
 		record.Name, record.ID)
 	return err
 }
