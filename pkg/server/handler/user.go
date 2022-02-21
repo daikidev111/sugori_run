@@ -146,6 +146,7 @@ func HandleUserUpdate() http.HandlerFunc {
 		}
 
 		// TODO: userテーブルの更新処理を実装 (ヒント: model.UpdateUserByPrimaryKeyを使用する)
+		model.UpdateUserByPrimaryKey
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
