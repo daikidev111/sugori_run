@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -28,7 +27,6 @@ func Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 
 		// TODO: データベースから認証トークンに紐づくユーザの情報を取得
 		user, err := model.SelectUserByAuthToken(token)
-		fmt.Println(user)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Invalid token")
