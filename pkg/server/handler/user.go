@@ -136,9 +136,6 @@ func HandleUserUpdate() http.HandlerFunc {
 
 		// TODO: ユーザデータの取得処理と存在チェックを実装 (ヒント: model.SelectUserByPrimaryKeyを使用する)
 
-		//var user *model.User
-		//var err error
-
 		user, err := model.SelectUserByPrimaryKey(userID)
 
 		if err != nil {
