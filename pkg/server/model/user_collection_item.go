@@ -41,5 +41,10 @@ func convertToUserCollectionItems(rows *sql.Rows) ([]*UserCollectionItem, error)
 		userCollectionItems = append(userCollectionItems, userCollectionItem)
 	}
 
+	if err := rows.Err(); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
 	return userCollectionItems, nil
 }
