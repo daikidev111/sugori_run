@@ -18,22 +18,24 @@ func SelectAllCollectionItems() ([]*CollectionItem, error) {
 	// Obtain all the items that the user, specified by user id from the user_collectionItem
 	// Conduct a loop to find the one that the user has, which will be marked as True for hasItem or else will be marked as False
 
-	rows_count, err := db.Conn.Query("SELECT id, name, rarity FROM collection_item ORDER BY id;")
+	rowsCount, err := db.Conn.Query("SELECT id, name, rarity FROM collection_item ORDER BY id;")
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
 
 	count := 0
-	for rows_count.Next() {
+	for rowsCount.Next() {
 		count += 1
 	}
+	if err := rowsCount.Err(); err != nil {
+		return nil, err
+	}
 
-	defer rows_count.Close()
+	defer rowsCount.Close()
 
 	rows, err := db.Conn.Query("SELECT id, name, rarity FROM collection_item ORDER BY id;")
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
@@ -43,8 +45,8 @@ func SelectAllCollectionItems() ([]*CollectionItem, error) {
 }
 
 // convertToCollectionItemでrowデータをCollectionItemデータへ変換する
-func convertToCollectionItem(rows *sql.Rows, num_rows int) ([]*CollectionItem, error) {
-	CollectionItems := make([]*CollectionItem, 0, num_rows)
+func convertToCollectionItem(rows *sql.Rows, rowsCount int) ([]*CollectionItem, error) {
+	CollectionItems := make([]*CollectionItem, 0, rowsCount)
 
 	for rows.Next() {
 		collectionItem := &CollectionItem{}
