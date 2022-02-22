@@ -28,20 +28,16 @@ func SelectUserCollectionItemByUserID(userID string) ([]*UserCollectionItem, err
 func convertToUserCollectionItems(rows *sql.Rows) ([]*UserCollectionItem, error) {
 	var userCollectionItems []*UserCollectionItem
 
-	defer rows.Close()
-
 	for rows.Next() {
 		userCollectionItem := &UserCollectionItem{}
 		err := rows.Scan(&userCollectionItem.UserID, &userCollectionItem.CollectionID)
 		if err != nil {
-			log.Println(err)
 			return nil, err
 		}
 		userCollectionItems = append(userCollectionItems, userCollectionItem)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Println(err)
 		return nil, err
 	}
 

@@ -20,7 +20,7 @@ type collectionListResponse struct {
 	Collections []collectionGetResponse `json:"collections"`
 }
 
-// HandleSettingGet ゲーム設定情報取得処理
+// HandleCollectionGet
 func HandleCollectionGet() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		// Contextから認証済みのユーザIDを取得
@@ -46,8 +46,7 @@ func HandleCollectionGet() http.HandlerFunc {
 			return
 		}
 
-		var userCollectionItems []*model.UserCollectionItem
-		userCollectionItems, err = model.SelectUserCollectionItemByUserID(userID)
+		userCollectionItems, err := model.SelectUserCollectionItemByUserID(userID)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
@@ -56,26 +55,19 @@ func HandleCollectionGet() http.HandlerFunc {
 
 		collectionItemArr := make([]collectionGetResponse, 0, len(collectionItems))
 
+		// valueはstructではなくboolにした
+		userCollectionItemsMap := make(map[string]bool, len(userCollectionItems))
+		for i := range userCollectionItems {
+			userCollectionItemsMap[userCollectionItems[i].CollectionID] = false
+		}
+
 		for i := range collectionItems {
 			c := collectionGetResponse{}
-			if len(userCollectionItems) > i {
-				if collectionItems[i].ID == userCollectionItems[i].CollectionID {
-					c.HasItem = true
-					c.CollectionID = collectionItems[i].ID
-					c.Name = collectionItems[i].Name
-					c.Rarity = collectionItems[i].Rarity
-				} else {
-					c.HasItem = false
-					c.CollectionID = collectionItems[i].ID
-					c.Name = collectionItems[i].Name
-					c.Rarity = collectionItems[i].Rarity
-				}
-			} else {
-				c.HasItem = false
-				c.CollectionID = collectionItems[i].ID
-				c.Name = collectionItems[i].Name
-				c.Rarity = collectionItems[i].Rarity
-			}
+
+			c.CollectionID = collectionItems[i].ID
+			c.Name = collectionItems[i].Name
+			c.Rarity = collectionItems[i].Rarity
+			_, c.HasItem = userCollectionItemsMap[collectionItems[i].ID]
 
 			collectionItemArr = append(collectionItemArr, c)
 		}
