@@ -13,7 +13,6 @@ type UserCollectionItem struct {
 }
 
 func SelectUserCollectionItemByUserID(userID string) ([]*UserCollectionItem, error) {
-
 	rows, err := db.Conn.Query("SELECT user_id, collection_item_id FROM user_collection_item where user_id = ?;", userID)
 
 	if err != nil {
