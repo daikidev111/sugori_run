@@ -17,7 +17,7 @@ func SelectAllCollectionItems() ([]*CollectionItem, error) {
 	// Obtain all the items exisiting in the collectionItem table
 	// Obtain all the items that the user, specified with user id from the user_collectionItem
 	// Conduct a loop to find the one that the user has, which will be marked as True for hasItem or else will be marked as False
-	rows, err := db.Conn.Query("SELECT id, name, rarity FROM collection_item;")
+	rows, err := db.Conn.Query("SELECT id, name, rarity FROM collection_item ORDER BY id;")
 
 	if err != nil {
 		log.Println(err)

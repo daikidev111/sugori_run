@@ -16,7 +16,7 @@ type collectionGetResponse struct {
 	HasItem      bool   `json:"hasItem"`
 }
 
-type CollectionListResponse struct {
+type collectionListResponse struct {
 	Collections []collectionGetResponse `json:"collections"`
 }
 
@@ -32,26 +32,9 @@ func HandleCollectionGet() http.HandlerFunc {
 			return
 		}
 
-		var userCollectionItems []*model.UserCollectionItem
-		var err error
-		userCollectionItems, err = model.SelectUserCollectionItemByUserID(userID)
-
-		if err != nil {
-			log.Println(err)
-			response.InternalServerError(writer, "Internal Server Error")
-			return
-		}
-
-		// Emptyの場合だとItemsを持っていないという状況だけなのでエラーハンドリングはしない
-		// if userCollectionItems == nil {
-		// 	log.Println("user collection item is empty")
-		// 	response.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
-		// 	return
-		// }
-
 		var collectionItems []*model.CollectionItem
+		var err error
 		collectionItems, err = model.SelectAllCollectionItems()
-
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
@@ -60,6 +43,14 @@ func HandleCollectionGet() http.HandlerFunc {
 		if collectionItems == nil {
 			log.Println("A collection of items is not found")
 			response.BadRequest(writer, "A collection of items is not found.")
+			return
+		}
+
+		var userCollectionItems []*model.UserCollectionItem
+		userCollectionItems, err = model.SelectUserCollectionItemByUserID(userID)
+		if err != nil {
+			log.Println(err)
+			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 
@@ -89,7 +80,7 @@ func HandleCollectionGet() http.HandlerFunc {
 			collectionItemArr = append(collectionItemArr, c)
 		}
 
-		response.Success(writer, &CollectionListResponse{
+		response.Success(writer, &collectionListResponse{
 			Collections: collectionItemArr,
 		})
 	}
