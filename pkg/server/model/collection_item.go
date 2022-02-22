@@ -18,7 +18,7 @@ func SelectAllCollectionItems() ([]*CollectionItem, error) {
 	// Obtain all the items that the user, specified by user id from the user_collectionItem
 	// Conduct a loop to find the one that the user has, which will be marked as True for hasItem or else will be marked as False
 
-	rowsCount, err := db.Conn.Query("SELECT id, name, rarity FROM collection_item ORDER BY id;")
+	rowsCount, err := db.Conn.Query("SELECT id, name, rarity FROM collection_item;")
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -34,7 +34,7 @@ func SelectAllCollectionItems() ([]*CollectionItem, error) {
 
 	defer rowsCount.Close()
 
-	rows, err := db.Conn.Query("SELECT id, name, rarity FROM collection_item ORDER BY id;")
+	rows, err := db.Conn.Query("SELECT id, name, rarity FROM collection_item;")
 	if err != nil {
 		return nil, err
 	}
