@@ -9,7 +9,6 @@ import (
 	"22dojo-online/pkg/server/model"
 )
 
-// {"ranks":[{"userId":"731269d9-b7b2-4931-b2e1-ad600226d5f1","userName":"ばったー","rank":31,"score":1477}]
 type RankingGetResponse struct {
 	UserID   string `json:"userId"`
 	UserName string `json:"userName"`
@@ -18,7 +17,7 @@ type RankingGetResponse struct {
 }
 
 type CollectionRankingResponse struct {
-	Ranks []RankingGetResponse `json:"ranks"`
+	Ranks []*RankingGetResponse `json:"ranks"`
 }
 
 // HandleRankingGet ランキング更新
@@ -44,18 +43,19 @@ func HandleRankingGet() http.HandlerFunc {
 			return
 		}
 
-		userRankingsArr := make([]RankingGetResponse, 0, len(userRankings))
+		userRankingsArr := make([]*RankingGetResponse, 0, len(userRankings))
 
 		startKeyCounter := startKey
-		for i := range userRankings {
-			r := RankingGetResponse{}
+		for _, user := range userRankings {
+			r := RankingGetResponse{
 
-			r.UserID = userRankings[i].UserID
-			r.UserName = userRankings[i].UserName
-			r.Score = userRankings[i].HighScore
-			r.Rank = int32(startKeyCounter)
+				UserID:   user.UserID,
+				UserName: user.UserName,
+				Score:    user.HighScore,
+				Rank:     int32(startKeyCounter),
+			}
 
-			userRankingsArr = append(userRankingsArr, r)
+			userRankingsArr = append(userRankingsArr, &r)
 			startKeyCounter++
 		}
 
