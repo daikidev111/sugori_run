@@ -53,17 +53,42 @@ func init() {
 func Transact(db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
 	tx, err := db.Begin()
 	if err != nil {
-		return
+		log.Printf("Begin is failed %v", err)
 	}
 	defer func() {
-		if p := recover(); p != nil {
-			tx.Rollback()
+		p := recover()
+		switch {
+		case err != nil:
+			if err := tx.Rollback(); err != nil {
+				log.Printf("Rollback is failed %v", err)
+			}
+
+		case p != nil:
+			if err := tx.Rollback(); err != nil {
+				log.Printf("Rollback is failed %v", err)
+			}
 			panic(p)
-		} else if err != nil {
-			tx.Rollback()
-		} else {
-			err = tx.Commit()
+
+		default:
+			if err := tx.Commit(); err != nil {
+				log.Printf("Commit is failed %v", err)
+			}
 		}
+		// if p := recover(); p != nil {
+		// 	if err := tx.Rollback(); err != nil {
+		// 		log.Printf("Rollback is failed %v", err)
+		// 	}
+		// 	panic(p)
+		// } else if err != nil {
+		// 	if err := tx.Rollback(); err != nil {
+		// 		log.Printf("Rollback is failed %v", err)
+		// 	}
+		// 	return
+		// } else {
+		// 	if err := tx.Commit(); err != nil {
+		// 		log.Printf("Commit is failed %v", err)
+		// 	}
+		// }
 	}()
 	err = txFunc(tx)
 	return err

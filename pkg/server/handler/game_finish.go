@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"22dojo-online/pkg/dcontext"
-	"22dojo-online/pkg/http/response"
-	"22dojo-online/pkg/server/model"
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"22dojo-online/pkg/dcontext"
+	"22dojo-online/pkg/http/response"
+	"22dojo-online/pkg/server/model"
 )
 
 type gameFinishRequest struct {
@@ -27,12 +28,12 @@ func HandleGameFinshPost() http.HandlerFunc {
 			return
 		}
 
-		score := int32(requestBody.Score)
-
-		if score < 0 {
+		if requestBody.Score < 0 {
 			log.Println("Negative score is invalid")
 			response.BadRequest(writer, "Negative score is invalid")
 		}
+
+		score := int32(requestBody.Score)
 
 		ctx := request.Context()
 		userID := dcontext.GetUserIDFromContext(ctx)
