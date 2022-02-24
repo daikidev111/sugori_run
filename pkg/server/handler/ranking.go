@@ -29,7 +29,17 @@ func HandleRankingGet() http.HandlerFunc {
 			return
 		}
 
-		startKey, _ := strconv.Atoi(keys[0]) // TODO: error handling
+		startKey, err := strconv.Atoi(keys[0])
+		if err != nil {
+			log.Println("Failed to convert the start key to int data type: Check Atoi in line 32")
+			response.InternalServerError(writer, "Internal Server Error")
+			return
+		}
+		if startKey < 1 {
+			log.Println("start key cannot be less than 1")
+			response.BadRequest(writer, "Bad Request")
+			return
+		}
 
 		userRankings, err := model.SelectUsersFromRankingStart(startKey)
 		if err != nil {
@@ -37,7 +47,7 @@ func HandleRankingGet() http.HandlerFunc {
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
-		if userRankings == nil {
+		if len(userRankings) == 0 {
 			log.Println("userRankings is empty")
 			response.InternalServerError(writer, "Internal Server Error")
 			return
@@ -48,14 +58,13 @@ func HandleRankingGet() http.HandlerFunc {
 		startKeyCounter := startKey
 		for _, user := range userRankings {
 			r := RankingGetResponse{
-
 				UserID:   user.UserID,
 				UserName: user.UserName,
 				Score:    user.HighScore,
 				Rank:     int32(startKeyCounter),
 			}
-
 			userRankingsArr = append(userRankingsArr, &r)
+
 			startKeyCounter++
 		}
 

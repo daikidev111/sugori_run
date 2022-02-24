@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 
+	"22dojo-online/pkg/constant"
 	"22dojo-online/pkg/db"
 )
 
@@ -55,9 +56,7 @@ func UpdateUserByPrimaryKey(record *User) error {
 }
 
 func SelectUsersFromRankingStart(start int) ([]*UserRanking, error) {
-	rankingNum := 10
-
-	rows, err := db.Conn.Query("SELECT `id`, `name`, `high_score` FROM `user` ORDER BY `high_score`, `id` DESC LIMIT ?, ?;", start, rankingNum)
+	rows, err := db.Conn.Query("SELECT `id`, `name`, `high_score` FROM `user` ORDER BY `high_score` DESC, `id` ASC LIMIT ?, ?;", start, constant.RankingNum)
 	if err != nil {
 		return nil, err
 	}
