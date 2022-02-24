@@ -45,13 +45,20 @@ func HandleRankingGet() http.HandlerFunc {
 		}
 		userRankingsArr := make([]*rankingGetResponse, 0, len(userRankings))
 
-		startKeyCounter := startKey
+		starKeyCounter, err := strconv.ParseInt(key, 10, 32)
+		if err != nil {
+			log.Println("Failed to convert the start key to int64 data type: Check Atoi in line 48")
+			response.InternalServerError(writer, "Internal Server Error")
+			return
+		}
+		startKeyCounter := int32(starKeyCounter)
+
 		for _, user := range userRankings {
 			userRankingsArr = append(userRankingsArr, &rankingGetResponse{
 				UserID:   user.UserID,
 				UserName: user.UserName,
 				Score:    user.HighScore,
-				Rank:     int32(startKeyCounter),
+				Rank:     startKeyCounter,
 			})
 
 			startKeyCounter++
