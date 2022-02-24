@@ -47,12 +47,6 @@ func HandleRankingGet() http.HandlerFunc {
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
-		if len(userRankings) == 0 {
-			log.Println("userRankings is empty")
-			response.InternalServerError(writer, "Internal Server Error")
-			return
-		}
-
 		userRankingsArr := make([]*rankingGetResponse, 0, len(userRankings))
 
 		startKeyCounter := startKey
