@@ -16,6 +16,12 @@ type User struct {
 	Coin      int32
 }
 
+type UserRanking struct {
+	UserID    string `json:"userId"`
+	UserName  string `json:"userName"`
+	HighScore int32  `json:"score"`
+}
+
 // InsertUser データベースをレコードを登録する
 func InsertUser(record *User) error {
 	// TODO: usersテーブルへのレコードの登録を行うSQLを入力する
@@ -46,6 +52,36 @@ func UpdateUserByPrimaryKey(record *User) error {
 		"UPDATE user SET name = ? WHERE id = ?",
 		record.Name, record.ID)
 	return err
+}
+
+func SelectUsersFromRankingStart(start int) ([]*UserRanking, error) {
+	rankingNum := 10
+
+	rows, err := db.Conn.Query("SELECT `id`, `name`, `high_score` FROM `user` ORDER BY `high_score`, `id` DESC LIMIT ?, ?;", start, rankingNum)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	return convertToUserForRanking(rows)
+}
+
+func convertToUserForRanking(rows *sql.Rows) ([]*UserRanking, error) {
+	UserRankings := make([]*UserRanking, 0)
+	for rows.Next() {
+		UserRanking := &UserRanking{}
+		err := rows.Scan(&UserRanking.UserID, &UserRanking.UserName, &UserRanking.HighScore)
+		if err != nil {
+			return nil, err
+		}
+		UserRankings = append(UserRankings, UserRanking)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return UserRankings, nil
 }
 
 // convertToUser rowデータをUserデータへ変換する
