@@ -66,6 +66,7 @@ func SelectUsersFromRankingStart(start int) ([]*UserRanking, error) {
 	return convertToUserForRanking(rows)
 }
 
+// convertToUserForRanking rowデータをUserRankingsデータへ変換する
 func convertToUserForRanking(rows *sql.Rows) ([]*UserRanking, error) {
 	UserRankings := make([]*UserRanking, 0)
 	for rows.Next() {
