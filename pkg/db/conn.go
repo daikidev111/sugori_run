@@ -48,3 +48,23 @@ func init() {
 			user, password, host, port, database, err)
 	}
 }
+
+// https://medium.com/a-journey-with-go/go-how-does-defer-statement-work-1a9492689b6e#:~:text=defer%20statement%20is%20a%20convenient,reverse%20order%20they%20were%20deferred.
+func Transact(db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
+	tx, err := db.Begin()
+	if err != nil {
+		return
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+	err = txFunc(tx)
+	return err
+}

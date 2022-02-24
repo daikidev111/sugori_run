@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"database/sql"
 	"log"
 
@@ -64,6 +65,43 @@ func SelectUsersFromRankingStart(start int) ([]*UserRanking, error) {
 	defer rows.Close()
 
 	return convertToUserForRanking(rows)
+}
+
+func UpdateCoinAndScoreByPrimaryKeyTx(ctx context.Context, userID string, score int32) error {
+	err := db.Transact(db.Conn, func(tx *sql.Tx) error {
+		row := tx.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id` = ?", userID)
+		user, err := convertToUser(row)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+
+		coin := user.Coin + score
+
+		if score > user.HighScore {
+			_, err = tx.Exec(
+				"UPDATE user SET high_score = ? WHERE id = ?",
+				score, userID)
+		}
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+
+		_, err = tx.Exec(
+			"UPDATE user SET coin = ? WHERE id = ?",
+			coin, userID)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 // convertToUserForRanking rowデータをUserRankingsデータへ変換する
