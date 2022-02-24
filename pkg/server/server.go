@@ -21,6 +21,10 @@ func Serve(addr string) {
 	http.HandleFunc("/user/update",
 		post(middleware.Authenticate(handler.HandleUserUpdate())))
 
+	// Collection List の表示の際のhttp handler
+	http.HandleFunc("/collection/list",
+		get(middleware.Authenticate(handler.HandleCollectionGet())))
+
 	/* ===== サーバの起動 ===== */
 	log.Println("Server running...")
 	err := http.ListenAndServe(addr, nil)
