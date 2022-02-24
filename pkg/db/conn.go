@@ -49,7 +49,6 @@ func init() {
 	}
 }
 
-// https://medium.com/a-journey-with-go/go-how-does-defer-statement-work-1a9492689b6e#:~:text=defer%20statement%20is%20a%20convenient,reverse%20order%20they%20were%20deferred.
 func Transact(db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
 	tx, err := db.Begin()
 	if err != nil {
@@ -57,39 +56,20 @@ func Transact(db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
 		return err
 	}
 	defer func() {
-		p := recover()
-		switch {
-		case err != nil:
-			if err := tx.Rollback(); err != nil {
-				log.Printf("Rollback is failed %v", err)
-			}
-
-		case p != nil:
+		if p := recover(); p != nil {
 			if err := tx.Rollback(); err != nil {
 				log.Printf("Rollback is failed %v", err)
 			}
 			panic(p)
-
-		default:
+		} else if err != nil {
+			if err := tx.Rollback(); err != nil {
+				log.Printf("Rollback is failed %v", err)
+			}
+		} else {
 			if err := tx.Commit(); err != nil {
-				log.Printf("Commit is failed %v", err)
+				log.Printf("Commit is failed: %v", err)
 			}
 		}
-		// if p := recover(); p != nil {
-		// 	if err := tx.Rollback(); err != nil {
-		// 		log.Printf("Rollback is failed %v", err)
-		// 	}
-		// 	panic(p)
-		// } else if err != nil {
-		// 	if err := tx.Rollback(); err != nil {
-		// 		log.Printf("Rollback is failed %v", err)
-		// 	}
-		// 	return
-		// } else {
-		// 	if err := tx.Commit(); err != nil {
-		// 		log.Printf("Commit is failed %v", err)
-		// 	}
-		// }
 	}()
 	err = txFunc(tx)
 	return err
