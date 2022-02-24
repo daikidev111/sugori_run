@@ -24,19 +24,24 @@ type gameFinishResponse struct {
 func HandleGameFinshPost() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		var requestBody gameFinishRequest
+
+		// Requestのスコアのdecode
 		if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
 			log.Println(err)
 			response.BadRequest(writer, "Bad Request")
 			return
 		}
 
+		// scoreが０以下の場合の考慮
 		if requestBody.Score < 0 {
 			log.Println("Negative score is invalid")
 			response.BadRequest(writer, "Negative score is invalid")
 		}
 
+		// int32へキャスト
 		score := int32(requestBody.Score)
 
+		// ユーザー認証(middleware)からのユーザーIDの取得
 		ctx := request.Context()
 		userID := dcontext.GetUserIDFromContext(ctx)
 		if userID == "" {
@@ -45,6 +50,7 @@ func HandleGameFinshPost() http.HandlerFunc {
 			return
 		}
 
+		// pkg/db/conn.goのトランザクション用のwrapper関数の呼び出し
 		err := db.Transact(db.Conn, func(tx *sql.Tx) error {
 			user, err := model.SelectUserByPrimaryKeyWithLock(userID, tx)
 			if err != nil {
@@ -60,7 +66,7 @@ func HandleGameFinshPost() http.HandlerFunc {
 				}
 			}
 
-			coin := user.Coin + score
+			coin := user.Coin + score // コインの計算方法
 			err = model.UpdateCoinByPrimaryKeyWithLock(userID, tx, coin)
 			if err != nil {
 				log.Println(err)
@@ -69,14 +75,15 @@ func HandleGameFinshPost() http.HandlerFunc {
 
 			return nil
 		})
-		if err != nil {
+		if err != nil { // トランザクションが失敗した場合
 			log.Println("DB Transaction failed")
 			response.BadRequest(writer, "Internal Server Error")
 			return
 		}
 
+		// responseとしてコインの値を返す
 		response.Success(writer, &gameFinishResponse{
-			Coin: score,
+			Coin: score, // 取得コインはスコアと同様にしている
 		})
 	}
 }

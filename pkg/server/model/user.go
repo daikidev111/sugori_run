@@ -34,27 +34,25 @@ func InsertUser(record *User) error {
 
 // SelectUserByAuthToken auth_tokenを条件にレコードを取得する
 func SelectUserByAuthToken(authToken string) (*User, error) {
-	// TODO: auth_tokenを条件にSELECTを行うSQLを第1引数に入力する
 	row := db.Conn.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `auth_token`=?", authToken)
 	return convertToUser(row)
 }
 
 // SelectUserByPrimaryKey 主キーを条件にレコードを取得する
 func SelectUserByPrimaryKey(userID string) (*User, error) {
-	// TODO: idを条件にSELECTを行うSQLを第1引数に入力する
 	row := db.Conn.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id`=?", userID)
 	return convertToUser(row)
 }
 
 // UpdateUserByPrimaryKey 主キーを条件にレコードを更新する
 func UpdateUserByPrimaryKey(record *User) error {
-	// TODO: idを条件に指定した値でnameカラムの値を更新するSQLを入力する
 	_, err := db.Conn.Exec(
 		"UPDATE user SET name = ? WHERE id = ?",
 		record.Name, record.ID)
 	return err
 }
 
+// SelectUsersFromRankingStart ランキングの表示をスコア降順で同率の場合はIDの昇順
 func SelectUsersFromRankingStart(start int) ([]*UserRanking, error) {
 	rows, err := db.Conn.Query("SELECT `id`, `name`, `high_score` FROM `user` ORDER BY `high_score` DESC, `id` ASC LIMIT ?, ?;", start-1, constant.RankingNum)
 	if err != nil {
@@ -66,11 +64,13 @@ func SelectUsersFromRankingStart(start int) ([]*UserRanking, error) {
 	return convertToUserForRanking(rows)
 }
 
+// SelectUserByPrimaryKeyWithLock 主キーを条件にユーザーを出力(排他制御あり)
 func SelectUserByPrimaryKeyWithLock(userID string, tx *sql.Tx) (*User, error) {
 	row := tx.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id` = ?", userID)
 	return convertToUser(row)
 }
 
+// UpdateCoinByPrimaryKeyWithLock 主キーを条件にユーザーのコインをアップデートする(排他制御あり)
 func UpdateCoinByPrimaryKeyWithLock(userID string, tx *sql.Tx, coin int32) error {
 	_, err := tx.Exec(
 		"UPDATE user SET coin = ? WHERE id = ?",
@@ -82,6 +82,7 @@ func UpdateCoinByPrimaryKeyWithLock(userID string, tx *sql.Tx, coin int32) error
 	return nil
 }
 
+// UpdateCoinByPrimaryKeyWithLock 主キーを条件にユーザーのスコアをアップデートする(排他制御あり)
 func UpdateScoreByPrimaryKeyWithLock(userID string, tx *sql.Tx, score int32) error {
 	_, err := tx.Exec(
 		"UPDATE user SET high_score = ? WHERE id = ?",
