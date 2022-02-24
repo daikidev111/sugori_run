@@ -54,6 +54,7 @@ func Transact(db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("Begin is failed %v", err)
+		return err
 	}
 	defer func() {
 		p := recover()
