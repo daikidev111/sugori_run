@@ -38,7 +38,7 @@ func HandleCollectionGet() http.HandlerFunc {
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
-		if collectionItems == nil {
+		if len(collectionItems) == 0 {
 			log.Println("A collection of items is not found")
 			response.BadRequest(writer, "A collection of items is not found.")
 			return
