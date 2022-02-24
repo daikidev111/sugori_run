@@ -56,7 +56,7 @@ func UpdateUserByPrimaryKey(record *User) error {
 }
 
 func SelectUsersFromRankingStart(start int) ([]*UserRanking, error) {
-	rows, err := db.Conn.Query("SELECT `id`, `name`, `high_score` FROM `user` ORDER BY `high_score` DESC, `id` ASC LIMIT ?, ?;", start, constant.RankingNum)
+	rows, err := db.Conn.Query("SELECT `id`, `name`, `high_score` FROM `user` ORDER BY `high_score` DESC, `id` ASC LIMIT ?, ?;", start-1, constant.RankingNum)
 	if err != nil {
 		return nil, err
 	}

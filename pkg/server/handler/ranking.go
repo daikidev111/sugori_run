@@ -23,13 +23,9 @@ type collectionRankingResponse struct {
 // HandleRankingGet ランキング更新
 func HandleRankingGet() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		keys, ok := request.URL.Query()["start"]
-		if !ok || len(keys[0]) < 1 { // [start] < 1 is invalid condition
-			log.Println("URL param 'start' is missing")
-			return
-		}
+		key := request.URL.Query().Get("start")
 
-		startKey, err := strconv.Atoi(keys[0])
+		startKey, err := strconv.Atoi(key)
 		if err != nil {
 			log.Println("Failed to convert the start key to int data type: Check Atoi in line 32")
 			response.InternalServerError(writer, "Internal Server Error")
@@ -51,13 +47,12 @@ func HandleRankingGet() http.HandlerFunc {
 
 		startKeyCounter := startKey
 		for _, user := range userRankings {
-			r := rankingGetResponse{
+			userRankingsArr = append(userRankingsArr, &rankingGetResponse{
 				UserID:   user.UserID,
 				UserName: user.UserName,
 				Score:    user.HighScore,
 				Rank:     int32(startKeyCounter),
-			}
-			userRankingsArr = append(userRankingsArr, &r)
+			})
 
 			startKeyCounter++
 		}
