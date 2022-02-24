@@ -17,7 +17,7 @@ type collectionGetResponse struct {
 }
 
 type collectionListResponse struct {
-	Collections []collectionGetResponse `json:"collections"`
+	Collections []*collectionGetResponse `json:"collections"`
 }
 
 // HandleCollectionGet
@@ -32,9 +32,7 @@ func HandleCollectionGet() http.HandlerFunc {
 			return
 		}
 
-		var collectionItems []*model.CollectionItem
-		var err error
-		collectionItems, err = model.SelectAllCollectionItems()
+		collectionItems, err := model.SelectAllCollectionItems()
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
@@ -53,23 +51,22 @@ func HandleCollectionGet() http.HandlerFunc {
 			return
 		}
 
-		collectionItemArr := make([]collectionGetResponse, 0, len(collectionItems))
+		collectionItemArr := make([]*collectionGetResponse, 0, len(collectionItems))
 
 		// valueはstructではなくboolにした
 		userCollectionItemsMap := make(map[string]bool, len(userCollectionItems))
 		for i := range userCollectionItems {
-			userCollectionItemsMap[userCollectionItems[i].CollectionID] = false
+			userCollectionItemsMap[userCollectionItems[i].CollectionID] = true
 		}
 
-		for i := range collectionItems {
-			c := collectionGetResponse{}
-
-			c.CollectionID = collectionItems[i].ID
-			c.Name = collectionItems[i].Name
-			c.Rarity = collectionItems[i].Rarity
-			_, c.HasItem = userCollectionItemsMap[collectionItems[i].ID]
-
-			collectionItemArr = append(collectionItemArr, c)
+		for _, item := range collectionItems {
+			c := collectionGetResponse{
+				CollectionID: item.ID,
+				Name:         item.Name,
+				Rarity:       item.Rarity,
+				HasItem:      userCollectionItemsMap[item.ID],
+			}
+			collectionItemArr = append(collectionItemArr, &c)
 		}
 
 		response.Success(writer, &collectionListResponse{
