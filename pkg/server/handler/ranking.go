@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"22dojo-online/pkg/http/response"
-	"22dojo-online/pkg/server/model"
 	"log"
 	"net/http"
 	"strconv"
+
+	"22dojo-online/pkg/http/response"
+	"22dojo-online/pkg/server/model"
 )
 
 // {"ranks":[{"userId":"731269d9-b7b2-4931-b2e1-ad600226d5f1","userName":"ばったー","rank":31,"score":1477}]
@@ -61,6 +62,5 @@ func HandleRankingGet() http.HandlerFunc {
 		response.Success(writer, &CollectionRankingResponse{
 			Ranks: userRankingsArr,
 		})
-
 	}
 }
