@@ -76,12 +76,12 @@ linters:
     # - gochecknoinits
     - goconst
     - gocritic
-    - gocyclo
+    # - gocyclo
     - gofmt
     - goimports
     # - gomnd
     - goprintffuncname
-    - gosec
+    # - gosec
     - gosimple
     - govet
     - ineffassign
