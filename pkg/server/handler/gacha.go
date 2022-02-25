@@ -22,7 +22,7 @@ type gachaResponse struct {
 }
 
 type GachaListResponse struct {
-	Result []*gachaResponse `json:"gachaList"`
+	Result []*gachaResponse `json:"results"`
 }
 
 type gachaRequest struct {
@@ -81,9 +81,10 @@ func HandleGachaPost() http.HandlerFunc {
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
+
 		var SumOfRatio int
 		for _, gachaProb := range gachaProbabilities {
-			SumOfRatio += int(gachaProb.Ratio) //TODO:  cast を治す -> 構造体のratioをイントにしても良いかも？？
+			SumOfRatio += gachaProb.Ratio
 		}
 
 		// トランザクションをここから開始する
@@ -126,7 +127,7 @@ func HandleGachaPost() http.HandlerFunc {
 
 				// ガチャで排出確率に基づいたコレクションアイテムの取得
 				for _, gachaProb := range gachaProbabilities {
-					targetRatio += int(gachaProb.Ratio) // TODO: cast直し
+					targetRatio += gachaProb.Ratio
 					if targetRatio > randInt {
 						targetCollectionID = gachaProb.CollectionID
 						break

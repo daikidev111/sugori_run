@@ -10,7 +10,7 @@ type GachaProbability struct {
 	CollectionID string
 	Name         string
 	Rarity       int32
-	Ratio        int32
+	Ratio        int
 }
 
 func SelectAllCollectionItemProbability() ([]*GachaProbability, error) {

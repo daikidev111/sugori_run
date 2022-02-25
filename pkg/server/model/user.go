@@ -25,7 +25,6 @@ type UserRanking struct {
 
 // InsertUser データベースをレコードを登録する
 func InsertUser(record *User) error {
-	// TODO: usersテーブルへのレコードの登録を行うSQLを入力する
 	_, err := db.Conn.Exec(
 		"INSERT INTO `user` (`id`, `auth_token`, `name`, `high_score`, `coin`) VALUES (?, ?, ?, ?, ?);",
 		record.ID, record.AuthToken, record.Name, record.HighScore, record.Coin)
@@ -80,15 +79,6 @@ func UpdateCoinAndScoreByPrimaryKeyWithLock(tx *sql.Tx, userID string, highScore
 	}
 
 	return nil
-}
-
-// TODO: Add with Lock later!!!!!!!!!!!!!!!!
-func UpdateCoinByPrimaryKey(userID string, coin int32) error {
-	_, err := db.Conn.Exec(
-		"UPDATE user SET coin = ? WHERE id = ?",
-		coin, userID)
-
-	return err
 }
 
 // convertToUserForRanking rowデータをUserRankingsデータへ変換する

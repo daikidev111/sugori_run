@@ -33,7 +33,6 @@ func SelectUserCollectionItemByUserIDWithLock(tx *sql.Tx, userID string) ([]*Use
 	return convertToUserCollectionItems(rows)
 }
 
-//TODO: ADD TRANSACTION !!!!!!!
 func InsertUserCollectionItemsByUserIDWithLock(tx *sql.Tx, userCollectionItems []*UserCollectionItem) error {
 	valueStrings := make([]string, 0, len(userCollectionItems))
 	valueArgs := make([]interface{}, 0, len(userCollectionItems)*3)
