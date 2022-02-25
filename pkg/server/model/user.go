@@ -66,7 +66,7 @@ func SelectUsersFromRankingStart(start int) ([]*UserRanking, error) {
 
 // SelectUserByPrimaryKeyWithLock 主キーを条件にユーザーを出力(排他制御あり)
 func SelectUserByPrimaryKeyWithLock(userID string, tx *sql.Tx) (*User, error) {
-	row := tx.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id` = ?", userID)
+	row := tx.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id` = ? FOR UPDATE", userID)
 	return convertToUser(row)
 }
 
