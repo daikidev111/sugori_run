@@ -76,7 +76,6 @@ func UpdateCoinByPrimaryKeyWithLock(userID string, tx *sql.Tx, coin int32) error
 		"UPDATE user SET coin = ? WHERE id = ?",
 		coin, userID)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -88,7 +87,6 @@ func UpdateCoinAndScoreByPrimaryKeyWithLock(userID string, tx *sql.Tx, score, co
 			"UPDATE user SET high_score = ? WHERE id = ?",
 			score, userID)
 		if err != nil {
-			log.Println(err)
 			return err
 		}
 	}
@@ -97,7 +95,6 @@ func UpdateCoinAndScoreByPrimaryKeyWithLock(userID string, tx *sql.Tx, score, co
 		"UPDATE user SET coin = ? WHERE id = ?",
 		coin, userID)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -110,7 +107,6 @@ func UpdateScoreByPrimaryKeyWithLock(userID string, tx *sql.Tx, score int32) err
 		"UPDATE user SET high_score = ? WHERE id = ?",
 		score, userID)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
