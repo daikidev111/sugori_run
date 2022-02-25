@@ -111,7 +111,7 @@ func HandleGachaPost() http.HandlerFunc {
 		// ここからループの実装？？ times 範囲内での
 
 		for i := 0; i < requestBody.Times; i++ {
-			log.Println(i)
+
 		}
 		randInt := rand.Intn(SumOfRatio) // 乱数の取得
 
@@ -140,14 +140,6 @@ func HandleGachaPost() http.HandlerFunc {
 			itemCollectionMap[collectionItem.ID] = collectionItems[i]
 		}
 
-		// 新アイテムはUserCollcetionItemsArrに格納(bulk insert時に必要となる)
-		if !userCollectionItemsMap[targetCollectionID] {
-			UserCollcetionItemsArr = append(UserCollcetionItemsArr, &model.UserCollectionItem{
-				UserID:       userID,
-				CollectionID: targetCollectionID,
-			})
-		}
-
 		// 共通処理: responseに格納
 		gachaCollectionList = append(gachaCollectionList, &gachaResponse{
 			CollectionID: targetCollectionID,
@@ -156,14 +148,29 @@ func HandleGachaPost() http.HandlerFunc {
 			IsNew:        !userCollectionItemsMap[targetCollectionID], // 新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalse
 		})
 
+		log.Println("Before insert", userCollectionItemsMap[targetCollectionID])
+
+		// 新アイテムはUserCollcetionItemsArrに格納(bulk insert時に必要となる)
+		if !userCollectionItemsMap[targetCollectionID] {
+			UserCollcetionItemsArr = append(UserCollcetionItemsArr, &model.UserCollectionItem{
+				UserID:       userID,
+				CollectionID: targetCollectionID,
+			})
+			userCollectionItemsMap[targetCollectionID] = true // 格納後はtrueに変換する
+		}
+
+		log.Println("After insert", userCollectionItemsMap[targetCollectionID])
+
 		// ========== end of the loop ==============
 
 		// bulk insertの開始
-		err = model.InsertUserCollectionItemsByUserID(UserCollcetionItemsArr)
-		if err != nil {
-			log.Println("Failed to insert the new item into the user's collection", err)
-			response.InternalServerError(writer, "Internal Server Error")
-			return
+		if len(UserCollcetionItemsArr) > 0 {
+			err = model.InsertUserCollectionItemsByUserID(UserCollcetionItemsArr)
+			if err != nil {
+				log.Println("Failed to insert the new item into the user's collection", err)
+				response.InternalServerError(writer, "Internal Server Error")
+				return
+			}
 		}
 
 		//コイン消費（コインをマイナスにしてアップデート処理）
