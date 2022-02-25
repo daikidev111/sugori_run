@@ -60,8 +60,38 @@ func HandleGachaPost() http.HandlerFunc {
 
 		gachaCollectionList := make([]*gachaResponse, 0, requestBody.Times) // Response用のスライス
 
+		collectionItems, err := model.SelectAllCollectionItems()
+		if err != nil {
+			log.Println(err)
+			response.InternalServerError(writer, "Internal Server Error")
+			return
+		}
+		if len(collectionItems) == 0 {
+			log.Println("A collection of items is not found")
+			response.BadRequest(writer, "A collection of items is not found.")
+			return
+		}
+
+		itemCollectionMap := make(map[string]*model.CollectionItem, len(collectionItems)) // itemCollectionのマップ
+
+		// IDのキーと格アイテムの情報が入っている静的マップの生成
+		for i, collectionItem := range collectionItems {
+			itemCollectionMap[collectionItem.ID] = collectionItems[i]
+		}
+
+		gachaProbabilities, err := model.SelectAllCollectionItemProbability()
+		if err != nil {
+			log.Println(err)
+			response.InternalServerError(writer, "Internal Server Error")
+			return
+		}
+		var SumOfRatio int
+		for _, gachaProb := range gachaProbabilities {
+			SumOfRatio += int(gachaProb.Ratio) //TODO:  cast を治す -> 構造体のratioをイントにしても良いかも？？
+		}
+
 		// トランザクションをここから開始する
-		err := db.Transact(ctx, db.Conn, func(tx *sql.Tx) error {
+		err = db.Transact(ctx, db.Conn, func(tx *sql.Tx) error {
 			user, err := model.SelectUserByPrimaryKeyWithLock(userID, tx)
 			if err != nil {
 				log.Println(err)
@@ -76,18 +106,6 @@ func HandleGachaPost() http.HandlerFunc {
 				return err
 			}
 
-			collectionItems, err := model.SelectAllCollectionItems()
-			if err != nil {
-				log.Println(err)
-				response.InternalServerError(writer, "Internal Server Error")
-				return err
-			}
-			if len(collectionItems) == 0 {
-				log.Println("A collection of items is not found")
-				response.BadRequest(writer, "A collection of items is not found.")
-				return err
-			}
-
 			userCollectionItems, err := model.SelectUserCollectionItemByUserIDWithLock(tx, userID)
 			if err != nil {
 				log.Println(err)
@@ -95,30 +113,12 @@ func HandleGachaPost() http.HandlerFunc {
 				return err
 			}
 
-			gachaProbabilities, err := model.SelectAllCollectionItemProbability()
-			if err != nil {
-				log.Println(err)
-				response.InternalServerError(writer, "Internal Server Error")
-				return err
-			}
-
 			UserCollcetionItemsArr := make([]*model.UserCollectionItem, 0, times)                // times -1かどうかの確認　Gachaで取得された新アイテムの格納
-			itemCollectionMap := make(map[string]*model.CollectionItem, len(collectionItems))    // itemCollectionのマップ
 			userCollectionItemsMap := make(map[string]bool, len(userCollectionItems)+int(times)) // user_collection_itemsのマップ
 
 			// すでに所持しているかをIDを突き合わせて判定するためのマップ(動的）
 			for _, userCollectionItem := range userCollectionItems {
 				userCollectionItemsMap[userCollectionItem.CollectionID] = true
-			}
-
-			// IDのキーと格アイテムの情報が入っている静的マップの生成
-			for i, collectionItem := range collectionItems {
-				itemCollectionMap[collectionItem.ID] = collectionItems[i]
-			}
-
-			var SumOfRatio int
-			for _, gachaProb := range gachaProbabilities {
-				SumOfRatio += int(gachaProb.Ratio) //TODO:  cast を治す -> 構造体のratioをイントにしても良いかも？？
 			}
 
 			// =========== start of the loop ===================
@@ -175,10 +175,14 @@ func HandleGachaPost() http.HandlerFunc {
 				response.InternalServerError(writer, "Internal Server Error")
 				return err
 			}
-
 			return nil
 		})
-		log.Println(err)
+		if err != nil { // トランザクションが失敗した場合
+			log.Println("DB Transaction failed: ")
+			log.Println(err)
+			response.BadRequest(writer, "Internal Server Error")
+			return
+		}
 
 		// responseを返す
 		response.Success(writer, &GachaListResponse{
