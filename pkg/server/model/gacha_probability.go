@@ -7,10 +7,10 @@ import (
 )
 
 type GachaProbability struct {
-	ID     string
-	Name   string
-	Rarity int32
-	Ratio  int32
+	CollectionID string
+	Name         string
+	Rarity       int32
+	Ratio        int32
 }
 
 func SelectAllCollectionItemProbability() ([]*GachaProbability, error) {
@@ -30,7 +30,7 @@ func convertToGachaProbability(rows *sql.Rows) ([]*GachaProbability, error) {
 
 	for rows.Next() {
 		gachaProbability := &GachaProbability{}
-		err := rows.Scan(&gachaProbability.ID, &gachaProbability.Name, &gachaProbability.Rarity, &gachaProbability.Ratio)
+		err := rows.Scan(&gachaProbability.CollectionID, &gachaProbability.Name, &gachaProbability.Rarity, &gachaProbability.Ratio)
 		if err != nil {
 			return nil, err
 		}

@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
 	"net/http"
 
 	"22dojo-online/pkg/constant"
@@ -83,12 +84,12 @@ func HandleGachaPost() http.HandlerFunc {
 			return
 		}
 
-		userCollectionItems, err := model.SelectUserCollectionItemByUserID(userID)
-		if err != nil {
-			log.Println(err)
-			response.InternalServerError(writer, "Internal Server Error")
-			return
-		}
+		// userCollectionItems, err := model.SelectUserCollectionItemByUserID(userID)
+		// if err != nil {
+		// 	log.Println(err)
+		// 	response.InternalServerError(writer, "Internal Server Error")
+		// 	return
+		// }
 
 		gachaProbabilities, err := model.SelectAllCollectionItemProbability()
 		if err != nil {
@@ -96,6 +97,27 @@ func HandleGachaPost() http.HandlerFunc {
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
+
+		var SumOfRatio int
+		for _, gachaProb := range gachaProbabilities {
+			SumOfRatio += int(gachaProb.Ratio) //TODO:  cast を治す -> 構造体のratioをイントにしても良いかも？？
+		}
+
+		// 乱数の取得
+
+		randInt := rand.Intn(SumOfRatio)
+
+		var targetRatio int
+		var targetCollectionItem string
+		for _, gachaProb := range gachaProbabilities {
+			targetRatio += int(gachaProb.Ratio)
+			log.Println(targetRatio)
+			if targetRatio > randInt {
+				targetCollectionItem = gachaProb.CollectionID
+			}
+		}
+
+		log.Println(targetCollectionItem)
 
 		// times 分をループで回す
 		// ガチャで排出確率に基づいたコレクションアイテムの取得
