@@ -2,6 +2,8 @@ package model
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
 
 	"22dojo-online/pkg/db"
 )
@@ -22,10 +24,21 @@ func SelectUserCollectionItemByUserID(userID string) ([]*UserCollectionItem, err
 	return convertToUserCollectionItems(rows)
 }
 
-//TODO: ADD TRANSACTION !!!!!!! AND MODIFY FOR BULK INSERT!
-func InsertUserCollectionItemByUserID(userID, collectionID string) error {
-	_, err := db.Conn.Exec("INSERT INTO user_collection_item (`user_id`,`collection_item_id`) VALUES (?, ?);", userID, collectionID)
+//TODO: ADD TRANSACTION !!!!!!!
+func InsertUserCollectionItemsByUserID(userCollectionItems []*UserCollectionItem) error {
+	valueStrings := make([]string, 0, len(userCollectionItems))
+	valueArgs := make([]interface{}, 0, len(userCollectionItems)*3)
+	for _, userCollectionItem := range userCollectionItems {
+		valueStrings = append(valueStrings, "(?, ?)")
+		valueArgs = append(valueArgs, userCollectionItem.UserID)
+		valueArgs = append(valueArgs, userCollectionItem.CollectionID)
+	}
+	stmt := fmt.Sprintf("INSERT INTO user_collection_item (user_id, collection_item_id) VALUES %s",
+		strings.Join(valueStrings, ","))
+	_, err := db.Conn.Exec(stmt, valueArgs...) // call Statusln with a variable number of arguments
+	// maybe remove statusln and directly access to the index of the arrays
 	return err
+
 }
 
 // func BulkInsert(unsavedRows []*gachaResponse) error {

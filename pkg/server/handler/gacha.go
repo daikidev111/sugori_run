@@ -56,8 +56,6 @@ func HandleGachaPost() http.HandlerFunc {
 			return
 		}
 
-		// トランザクションをここから開始する
-
 		user, err := model.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Println(err)
@@ -71,6 +69,8 @@ func HandleGachaPost() http.HandlerFunc {
 			response.BadRequest(writer, "Invalid gacha draw")
 			return
 		}
+
+		// トランザクションをここから開始する
 
 		collectionItems, err := model.SelectAllCollectionItems()
 		if err != nil {
@@ -103,16 +103,24 @@ func HandleGachaPost() http.HandlerFunc {
 			SumOfRatio += int(gachaProb.Ratio) //TODO:  cast を治す -> 構造体のratioをイントにしても良いかも？？
 		}
 
+		UserCollcetionItemsArr := make([]*model.UserCollectionItem, 0, times)             // times -1かどうかの確認　Gachaで取得された新アイテムの格納
+		gachaCollectionList := make([]*gachaResponse, 0, times)                           // Response用のスライス
+		itemCollectionMap := make(map[string]*model.CollectionItem, len(collectionItems)) // itemCollectionのマップ
+		userCollectionItemsMap := make(map[string]bool, len(userCollectionItems))         // user_collection_itemsのマップ
+
 		// ここからループの実装？？ times 範囲内での
-		// 乱数の取得
-		randInt := rand.Intn(SumOfRatio)
 
-		var targetRatio int
-		var targetCollectionID string
+		for i := 0; i < requestBody.Times; i++ {
+			log.Println(i)
+		}
+		randInt := rand.Intn(SumOfRatio) // 乱数の取得
 
+		var targetRatio int           // Ratioから取得される値を足す際に必要
+		var targetCollectionID string // 乱数を越した際のcollection ID(ガチャの引きアイテム)
+
+		// ガチャで排出確率に基づいたコレクションアイテムの取得
 		for _, gachaProb := range gachaProbabilities {
 			targetRatio += int(gachaProb.Ratio)
-			// ガチャで排出確率に基づいたコレクションアイテムの取得
 			if targetRatio > randInt {
 				targetCollectionID = gachaProb.CollectionID
 				break
@@ -123,29 +131,24 @@ func HandleGachaPost() http.HandlerFunc {
 			すでに所持しているかをIDを突き合わせて判定
 			（新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalseとなります。）重複はなし
 		*/
-
-		userCollectionItemsMap := make(map[string]bool, len(userCollectionItems))
 		for i := range userCollectionItems {
 			userCollectionItemsMap[userCollectionItems[i].CollectionID] = true
 		}
 
-		itemCollectionMap := make(map[string]*model.CollectionItem, len(collectionItems))
+		// IDのキーと格アイテムの情報が入っているマップの生成
 		for i, collectionItem := range collectionItems {
 			itemCollectionMap[collectionItem.ID] = collectionItems[i]
 		}
 
-		// user collectionの中で獲得されたアイテムの存在確認
-		if !userCollectionItemsMap[targetCollectionID] { // もしuser collectionのアイテムの重複していない場合はcollectionitemuserに格納する bulk insertでの実装？？
-			err = model.InsertUserCollectionItemByUserID(userID, targetCollectionID)
-			if err != nil {
-				log.Println("Failed to insert the new item into the user's collection", err)
-				response.InternalServerError(writer, "Internal Server Error")
-				return
-			}
+		// 新アイテムはUserCollcetionItemsArrに格納(bulk insert時に必要となる)
+		if !userCollectionItemsMap[targetCollectionID] {
+			UserCollcetionItemsArr = append(UserCollcetionItemsArr, &model.UserCollectionItem{
+				UserID:       userID,
+				CollectionID: targetCollectionID,
+			})
 		}
 
-		// 共通処理は、responseに格納
-		gachaCollectionList := make([]*gachaResponse, 0, times)
+		// 共通処理: responseに格納
 		gachaCollectionList = append(gachaCollectionList, &gachaResponse{
 			CollectionID: targetCollectionID,
 			Name:         itemCollectionMap[targetCollectionID].Name,
@@ -153,8 +156,18 @@ func HandleGachaPost() http.HandlerFunc {
 			IsNew:        !userCollectionItemsMap[targetCollectionID], // 新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalse
 		})
 
+		// ========== end of the loop ==============
+
+		// bulk insertの開始
+		err = model.InsertUserCollectionItemsByUserID(UserCollcetionItemsArr)
+		if err != nil {
+			log.Println("Failed to insert the new item into the user's collection", err)
+			response.InternalServerError(writer, "Internal Server Error")
+			return
+		}
+
 		//コイン消費（コインをマイナスにしてアップデート処理）
-		user.Coin -= constant.GachaCoinConsumption
+		user.Coin -= constant.GachaCoinConsumption * times
 		err = model.UpdateCoinByPrimaryKey(userID, user.Coin)
 		if err != nil {
 			log.Println("Failed to update the user's coin", err)
@@ -162,8 +175,11 @@ func HandleGachaPost() http.HandlerFunc {
 			return
 		}
 
+		// responseを返す
 		response.Success(writer, &gachaListResponse{
 			Result: gachaCollectionList,
 		})
 	}
 }
+
+// transaction -> select user by primary key, select all user collection items, update coin, inseruser collections,
