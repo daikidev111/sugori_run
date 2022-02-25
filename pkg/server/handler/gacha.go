@@ -19,13 +19,13 @@ type gachaResponse struct {
 	IsNew        bool   `json:"isNew"`
 }
 
-// type gachaListResponse struct {
-// 	Result []*gachaResponse `json:"gachaList"`
-// }
-
 type gachaListResponse struct {
-	Result int `json:"gachaList"`
+	Result []*gachaResponse `json:"gachaList"`
 }
+
+// type gachaListResponse struct {
+// 	Result int `json:"gachaList"`
+// }
 
 type gachaRequest struct {
 	Times int `json:"times"`
@@ -103,8 +103,8 @@ func HandleGachaPost() http.HandlerFunc {
 			SumOfRatio += int(gachaProb.Ratio) //TODO:  cast を治す -> 構造体のratioをイントにしても良いかも？？
 		}
 
+		// ここからループの実装？？ times 範囲内での
 		// 乱数の取得
-
 		randInt := rand.Intn(SumOfRatio)
 
 		var targetRatio int
@@ -129,32 +129,36 @@ func HandleGachaPost() http.HandlerFunc {
 			userCollectionItemsMap[userCollectionItems[i].CollectionID] = true
 		}
 
-		// itemCollectionMap := make(map[string]*CollectionItem, len(collectionItems))
-		// for i, collectionItem := range CollectionItems {
-
-		// } Implement from here
-
-		c := gachaResponse{
-			CollectionID: targetCollectionID,
-			Name:         item.Name,
-			Rarity:       item.Rarity,
-			IsNew:        userCollectionItemsMap[targetCollectionID],
+		itemCollectionMap := make(map[string]*model.CollectionItem, len(collectionItems))
+		for i, collectionItem := range collectionItems {
+			itemCollectionMap[collectionItem.ID] = collectionItems[i]
 		}
 
-		// collectionItemArr = append(collectionItemArr, &c)
+		// もしuser collectionのアイテムの重複していない場合はcollectionitemuserに格納する bulk insertでの実装？？
+
+		// 共通処理は、responseに格納
+		gachaCollectionList := make([]*gachaResponse, 0, times)
+		gachaCollectionList = append(gachaCollectionList, &gachaResponse{
+			CollectionID: targetCollectionID,
+			Name:         itemCollectionMap[targetCollectionID].Name,
+			Rarity:       itemCollectionMap[targetCollectionID].Rarity,
+			IsNew:        userCollectionItemsMap[targetCollectionID], // 新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalse
+		})
 
 		// user collectionの中で獲得されたアイテムの存在確認
 
 		// もし、存在していない場合はinsert into usercollectionitem
 
-		// 共通処理は、responseに格納
-
 		//コイン消費（コインをマイナスにしてアップデート処理）
-
-		// もしuser collectionのアイテムの重複していない場合はcollectionitemuserに格納する bulk insertでの実装？？
+		var coin int32
+		coin -= constant.GachaCoinConsumption
 
 		response.Success(writer, &gachaListResponse{
-			Result: 1,
+			Result: gachaCollectionList,
 		})
 	}
 }
+
+// TODO: model 書き込み
+// coin のアップデート
+// usercollectionitemへのインサート
