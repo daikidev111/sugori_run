@@ -32,13 +32,12 @@ func HandleGameFinishPost() http.HandlerFunc {
 		}
 
 		// scoreが1以下の場合の考慮
-		if requestBody.Score < 1 { // 0でも処理をしなくて良い
+		score := requestBody.Score
+		if score < 1 { // 0でも処理をしなくて良い
 			log.Println("Negative score is invalid")
 			response.BadRequest(writer, "Negative score is invalid")
 			return
 		}
-
-		score := requestBody.Score
 
 		// ユーザー認証(middleware)からのユーザーIDの取得
 		ctx := request.Context()
@@ -63,7 +62,7 @@ func HandleGameFinishPost() http.HandlerFunc {
 				user.HighScore = score
 			}
 
-			err = model.UpdateCoinAndScoreByPrimaryKeyWithLock(userID, tx, user.HighScore, coin)
+			err = model.UpdateCoinAndScoreByPrimaryKeyWithLock(tx, userID, user.HighScore, coin)
 			if err != nil {
 				log.Println(err)
 				return err

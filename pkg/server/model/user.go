@@ -71,7 +71,7 @@ func SelectUserByPrimaryKeyWithLock(userID string, tx *sql.Tx) (*User, error) {
 }
 
 // UpdateCoinAndScoreByPrimaryKeyWithLock 主キーを条件にスコアとコインの更新処理(排他制御あり)
-func UpdateCoinAndScoreByPrimaryKeyWithLock(userID string, tx *sql.Tx, highScore, coin int32) error {
+func UpdateCoinAndScoreByPrimaryKeyWithLock(tx *sql.Tx, userID string, highScore, coin int32) error {
 	_, err := tx.Exec(
 		"UPDATE user SET coin = ?, high_score = ? WHERE id = ?",
 		coin, highScore, userID)
