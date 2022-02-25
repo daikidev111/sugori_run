@@ -38,7 +38,6 @@ func HandleGameFinishPost() http.HandlerFunc {
 			return
 		}
 
-		// int32へキャスト
 		score := requestBody.Score
 
 		// ユーザー認証(middleware)からのユーザーIDの取得
@@ -58,22 +57,13 @@ func HandleGameFinishPost() http.HandlerFunc {
 				return err
 			}
 
-			// if score > user.HighScore {
-			// 	err = model.UpdateScoreByPrimaryKeyWithLock(userID, tx, score)
-			// 	if err != nil {
-			// 		log.Println(err)
-			// 		return err
-			// 	}
-			// }
-
 			coin := user.Coin + score // コインの計算方法
-			// err = model.UpdateCoinByPrimaryKeyWithLock(userID, tx, coin)
-			// if err != nil {
-			// 	log.Println(err)
-			// 	return err
-			// }
 
-			err = model.UpdateCoinAndScoreByPrimaryKeyWithLock(userID, tx, score, coin, user.HighScore)
+			if user.HighScore < score {
+				user.HighScore = score
+			}
+
+			err = model.UpdateCoinAndScoreByPrimaryKeyWithLock(userID, tx, user.HighScore, coin)
 			if err != nil {
 				log.Println(err)
 				return err

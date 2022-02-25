@@ -70,45 +70,15 @@ func SelectUserByPrimaryKeyWithLock(userID string, tx *sql.Tx) (*User, error) {
 	return convertToUser(row)
 }
 
-// UpdateCoinByPrimaryKeyWithLock 主キーを条件にユーザーのコインをアップデートする(排他制御あり)
-func UpdateCoinByPrimaryKeyWithLock(userID string, tx *sql.Tx, coin int32) error {
+// UpdateCoinAndScoreByPrimaryKeyWithLock 主キーを条件にスコアとコインの更新処理(排他制御あり)
+func UpdateCoinAndScoreByPrimaryKeyWithLock(userID string, tx *sql.Tx, highScore, coin int32) error {
 	_, err := tx.Exec(
-		"UPDATE user SET coin = ? WHERE id = ?",
-		coin, userID)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func UpdateCoinAndScoreByPrimaryKeyWithLock(userID string, tx *sql.Tx, score, coin, originalScore int32) error {
-	if score > originalScore {
-		_, err := tx.Exec(
-			"UPDATE user SET high_score = ? WHERE id = ?",
-			score, userID)
-		if err != nil {
-			return err
-		}
-	}
-
-	_, err := tx.Exec(
-		"UPDATE user SET coin = ? WHERE id = ?",
-		coin, userID)
+		"UPDATE user SET coin = ?, high_score = ? WHERE id = ?",
+		coin, highScore, userID)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-// UpdateCoinByPrimaryKeyWithLock 主キーを条件にユーザーのスコアをアップデートする(排他制御あり)
-func UpdateScoreByPrimaryKeyWithLock(userID string, tx *sql.Tx, score int32) error {
-	_, err := tx.Exec(
-		"UPDATE user SET high_score = ? WHERE id = ?",
-		score, userID)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
