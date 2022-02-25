@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -49,7 +50,7 @@ func init() {
 	}
 }
 
-func Transact(db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
+func Transact(ctx context.Context, db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("Begin is failed %v", err)

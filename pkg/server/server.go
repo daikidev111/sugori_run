@@ -29,7 +29,7 @@ func Serve(addr string) {
 		get(middleware.Authenticate(handler.HandleRankingGet())))
 
 	http.HandleFunc("/game/finish",
-		post(middleware.Authenticate(handler.HandleGameFinshPost())))
+		post(middleware.Authenticate(handler.HandleGameFinishPost())))
 
 	/* ===== サーバの起動 ===== */
 	log.Println("Server running...")

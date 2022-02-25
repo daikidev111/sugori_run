@@ -13,19 +13,18 @@ import (
 )
 
 type gameFinishRequest struct {
-	Score int `json:"score"`
+	Score int32 `json:"score"`
 }
 
 type gameFinishResponse struct {
 	Coin int32 `json:"coin"`
 }
 
-// HandleGameFinshPost GameFinish時のリクエストとレスポンスの処理
-func HandleGameFinshPost() http.HandlerFunc {
+// HandleGameFinishPost GameFinish時のリクエストとレスポンスの処理
+func HandleGameFinishPost() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		var requestBody gameFinishRequest
-
 		// Requestのスコアのdecode
+		var requestBody gameFinishRequest
 		if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
 			log.Println(err)
 			response.BadRequest(writer, "Bad Request")
@@ -39,7 +38,7 @@ func HandleGameFinshPost() http.HandlerFunc {
 		}
 
 		// int32へキャスト
-		score := int32(requestBody.Score)
+		score := requestBody.Score
 
 		// ユーザー認証(middleware)からのユーザーIDの取得
 		ctx := request.Context()
@@ -51,7 +50,7 @@ func HandleGameFinshPost() http.HandlerFunc {
 		}
 
 		// pkg/db/conn.goのトランザクション用のwrapper関数の呼び出し
-		err := db.Transact(db.Conn, func(tx *sql.Tx) error {
+		err := db.Transact(ctx, db.Conn, func(tx *sql.Tx) error {
 			user, err := model.SelectUserByPrimaryKeyWithLock(userID, tx)
 			if err != nil {
 				log.Println(err)
@@ -76,7 +75,8 @@ func HandleGameFinshPost() http.HandlerFunc {
 			return nil
 		})
 		if err != nil { // トランザクションが失敗した場合
-			log.Println("DB Transaction failed")
+			log.Println("DB Transaction failed: ")
+			log.Println(err)
 			response.BadRequest(writer, "Internal Server Error")
 			return
 		}
