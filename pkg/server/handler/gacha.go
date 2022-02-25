@@ -25,10 +25,6 @@ type GachaListResponse struct {
 	Result []*gachaResponse `json:"gachaList"`
 }
 
-// type gachaListResponse struct {
-// 	Result int `json:"gachaList"`
-// }
-
 type gachaRequest struct {
 	Times int `json:"times"`
 }
@@ -113,7 +109,7 @@ func HandleGachaPost() http.HandlerFunc {
 				return err
 			}
 
-			UserCollcetionItemsArr := make([]*model.UserCollectionItem, 0, times)                // times -1かどうかの確認　Gachaで取得された新アイテムの格納
+			UserCollectionItemsArr := make([]*model.UserCollectionItem, 0, times)                // times -1かどうかの確認　Gachaで取得された新アイテムの格納
 			userCollectionItemsMap := make(map[string]bool, len(userCollectionItems)+int(times)) // user_collection_itemsのマップ
 
 			// すでに所持しているかをIDを突き合わせて判定するためのマップ(動的）
@@ -123,7 +119,6 @@ func HandleGachaPost() http.HandlerFunc {
 
 			// =========== start of the loop ===================
 			for i := 0; i < requestBody.Times; i++ {
-
 				randInt := rand.Intn(SumOfRatio) // 乱数の取得
 
 				var targetRatio int           // Ratioから取得される値を足す際に必要
@@ -148,7 +143,7 @@ func HandleGachaPost() http.HandlerFunc {
 
 				// 新アイテムはUserCollcetionItemsArrに格納(bulk insert時に必要となる)
 				if !userCollectionItemsMap[targetCollectionID] {
-					UserCollcetionItemsArr = append(UserCollcetionItemsArr, &model.UserCollectionItem{ // TODO: fix typo UserCollcetionItemsArr
+					UserCollectionItemsArr = append(UserCollectionItemsArr, &model.UserCollectionItem{
 						UserID:       userID,
 						CollectionID: targetCollectionID,
 					})
@@ -158,8 +153,8 @@ func HandleGachaPost() http.HandlerFunc {
 			// ========== end of the loop ==============
 
 			// bulk insertの開始
-			if len(UserCollcetionItemsArr) > 0 {
-				err = model.InsertUserCollectionItemsByUserIDWithLock(tx, UserCollcetionItemsArr)
+			if len(UserCollectionItemsArr) > 0 {
+				err = model.InsertUserCollectionItemsByUserIDWithLock(tx, UserCollectionItemsArr)
 				if err != nil {
 					log.Println("Failed to insert the new item into the user's collection", err)
 					response.InternalServerError(writer, "Internal Server Error")
@@ -167,7 +162,7 @@ func HandleGachaPost() http.HandlerFunc {
 				}
 			}
 
-			//コイン消費（コインをマイナスにしてアップデート処理）
+			// コイン消費（コインをマイナスにしてアップデート処理）
 			user.Coin -= constant.GachaCoinConsumption * times
 			err = model.UpdateCoinAndScoreByPrimaryKeyWithLock(tx, userID, user.HighScore, user.Coin)
 			if err != nil {
@@ -190,5 +185,3 @@ func HandleGachaPost() http.HandlerFunc {
 		})
 	}
 }
-
-// transaction -> inseruser collections,
