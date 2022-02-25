@@ -51,7 +51,7 @@ func init() {
 }
 
 func Transact(ctx context.Context, db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
-	tx, err := db.Begin()
+	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		log.Printf("Begin is failed %v", err)
 		return err
