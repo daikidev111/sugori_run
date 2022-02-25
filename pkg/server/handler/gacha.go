@@ -110,7 +110,7 @@ func HandleGachaPost() http.HandlerFunc {
 				return err
 			}
 
-			UserCollectionItemsArr := make([]*model.UserCollectionItem, 0, times)                // times -1かどうかの確認　Gachaで取得された新アイテムの格納
+			UserCollectionItemsArr := make([]*model.UserCollectionItem, 0, times)                // Gachaで取得された新アイテムの格納
 			userCollectionItemsMap := make(map[string]bool, len(userCollectionItems)+int(times)) // user_collection_itemsのマップ
 
 			// すでに所持しているかをIDを突き合わせて判定するためのマップ(動的）
