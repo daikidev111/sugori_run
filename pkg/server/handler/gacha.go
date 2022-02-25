@@ -84,12 +84,12 @@ func HandleGachaPost() http.HandlerFunc {
 			return
 		}
 
-		// userCollectionItems, err := model.SelectUserCollectionItemByUserID(userID)
-		// if err != nil {
-		// 	log.Println(err)
-		// 	response.InternalServerError(writer, "Internal Server Error")
-		// 	return
-		// }
+		userCollectionItems, err := model.SelectUserCollectionItemByUserID(userID)
+		if err != nil {
+			log.Println(err)
+			response.InternalServerError(writer, "Internal Server Error")
+			return
+		}
 
 		gachaProbabilities, err := model.SelectAllCollectionItemProbability()
 		if err != nil {
@@ -108,30 +108,50 @@ func HandleGachaPost() http.HandlerFunc {
 		randInt := rand.Intn(SumOfRatio)
 
 		var targetRatio int
-		var targetCollectionItem string
+		var targetCollectionID string
+
 		for _, gachaProb := range gachaProbabilities {
 			targetRatio += int(gachaProb.Ratio)
-			log.Println(targetRatio)
+			// ガチャで排出確率に基づいたコレクションアイテムの取得
 			if targetRatio > randInt {
-				targetCollectionItem = gachaProb.CollectionID
+				targetCollectionID = gachaProb.CollectionID
+				break
 			}
 		}
-
-		log.Println(targetCollectionItem)
-
-		// times 分をループで回す
-		// ガチャで排出確率に基づいたコレクションアイテムの取得
-
-		// gacha の
 
 		/*
 			すでに所持しているかをIDを突き合わせて判定
 			（新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalseとなります。）重複はなし
 		*/
 
+		userCollectionItemsMap := make(map[string]bool, len(userCollectionItems))
+		for i := range userCollectionItems {
+			userCollectionItemsMap[userCollectionItems[i].CollectionID] = true
+		}
+
+		// itemCollectionMap := make(map[string]*CollectionItem, len(collectionItems))
+		// for i, collectionItem := range CollectionItems {
+
+		// } Implement from here
+
+		c := gachaResponse{
+			CollectionID: targetCollectionID,
+			Name:         item.Name,
+			Rarity:       item.Rarity,
+			IsNew:        userCollectionItemsMap[targetCollectionID],
+		}
+
+		// collectionItemArr = append(collectionItemArr, &c)
+
+		// user collectionの中で獲得されたアイテムの存在確認
+
+		// もし、存在していない場合はinsert into usercollectionitem
+
+		// 共通処理は、responseに格納
+
 		//コイン消費（コインをマイナスにしてアップデート処理）
 
-		// それを重複していない場合はcollectionitemuserに格納する bulk insertでの実装？？
+		// もしuser collectionのアイテムの重複していない場合はcollectionitemuserに格納する bulk insertでの実装？？
 
 		response.Success(writer, &gachaListResponse{
 			Result: 1,
