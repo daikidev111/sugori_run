@@ -98,69 +98,60 @@ func HandleGachaPost() http.HandlerFunc {
 			return
 		}
 
+		UserCollcetionItemsArr := make([]*model.UserCollectionItem, 0, times)                // times -1かどうかの確認　Gachaで取得された新アイテムの格納
+		gachaCollectionList := make([]*gachaResponse, 0, times)                              // Response用のスライス
+		itemCollectionMap := make(map[string]*model.CollectionItem, len(collectionItems))    // itemCollectionのマップ
+		userCollectionItemsMap := make(map[string]bool, len(userCollectionItems)+int(times)) // user_collection_itemsのマップ
+
+		// すでに所持しているかをIDを突き合わせて判定するためのマップ(動的）
+		for _, userCollectionItem := range userCollectionItems {
+			userCollectionItemsMap[userCollectionItem.CollectionID] = true
+		}
+
+		// IDのキーと格アイテムの情報が入っている静的マップの生成
+		for i, collectionItem := range collectionItems {
+			itemCollectionMap[collectionItem.ID] = collectionItems[i]
+		}
+
 		var SumOfRatio int
 		for _, gachaProb := range gachaProbabilities {
 			SumOfRatio += int(gachaProb.Ratio) //TODO:  cast を治す -> 構造体のratioをイントにしても良いかも？？
 		}
 
-		UserCollcetionItemsArr := make([]*model.UserCollectionItem, 0, times)             // times -1かどうかの確認　Gachaで取得された新アイテムの格納
-		gachaCollectionList := make([]*gachaResponse, 0, times)                           // Response用のスライス
-		itemCollectionMap := make(map[string]*model.CollectionItem, len(collectionItems)) // itemCollectionのマップ
-		userCollectionItemsMap := make(map[string]bool, len(userCollectionItems))         // user_collection_itemsのマップ
-
-		// ここからループの実装？？ times 範囲内での
-
+		// =========== start of the loop ===================
 		for i := 0; i < requestBody.Times; i++ {
 
-		}
-		randInt := rand.Intn(SumOfRatio) // 乱数の取得
+			randInt := rand.Intn(SumOfRatio) // 乱数の取得
 
-		var targetRatio int           // Ratioから取得される値を足す際に必要
-		var targetCollectionID string // 乱数を越した際のcollection ID(ガチャの引きアイテム)
+			var targetRatio int           // Ratioから取得される値を足す際に必要
+			var targetCollectionID string // 乱数を越した際のcollection ID(ガチャの引きアイテム)
 
-		// ガチャで排出確率に基づいたコレクションアイテムの取得
-		for _, gachaProb := range gachaProbabilities {
-			targetRatio += int(gachaProb.Ratio)
-			if targetRatio > randInt {
-				targetCollectionID = gachaProb.CollectionID
-				break
+			// ガチャで排出確率に基づいたコレクションアイテムの取得
+			for _, gachaProb := range gachaProbabilities {
+				targetRatio += int(gachaProb.Ratio) // TODO: cast直し
+				if targetRatio > randInt {
+					targetCollectionID = gachaProb.CollectionID
+					break
+				}
+			}
+
+			// 共通処理: responseに格納
+			gachaCollectionList = append(gachaCollectionList, &gachaResponse{
+				CollectionID: targetCollectionID,
+				Name:         itemCollectionMap[targetCollectionID].Name,
+				Rarity:       itemCollectionMap[targetCollectionID].Rarity,
+				IsNew:        !userCollectionItemsMap[targetCollectionID], // 新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalse
+			})
+
+			// 新アイテムはUserCollcetionItemsArrに格納(bulk insert時に必要となる)
+			if !userCollectionItemsMap[targetCollectionID] {
+				UserCollcetionItemsArr = append(UserCollcetionItemsArr, &model.UserCollectionItem{ // TODO: fix typo UserCollcetionItemsArr
+					UserID:       userID,
+					CollectionID: targetCollectionID,
+				})
+				userCollectionItemsMap[targetCollectionID] = true // 格納後はtrueに変換する
 			}
 		}
-
-		/*
-			すでに所持しているかをIDを突き合わせて判定
-			（新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalseとなります。）重複はなし
-		*/
-		for i := range userCollectionItems {
-			userCollectionItemsMap[userCollectionItems[i].CollectionID] = true
-		}
-
-		// IDのキーと格アイテムの情報が入っているマップの生成
-		for i, collectionItem := range collectionItems {
-			itemCollectionMap[collectionItem.ID] = collectionItems[i]
-		}
-
-		// 共通処理: responseに格納
-		gachaCollectionList = append(gachaCollectionList, &gachaResponse{
-			CollectionID: targetCollectionID,
-			Name:         itemCollectionMap[targetCollectionID].Name,
-			Rarity:       itemCollectionMap[targetCollectionID].Rarity,
-			IsNew:        !userCollectionItemsMap[targetCollectionID], // 新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalse
-		})
-
-		log.Println("Before insert", userCollectionItemsMap[targetCollectionID])
-
-		// 新アイテムはUserCollcetionItemsArrに格納(bulk insert時に必要となる)
-		if !userCollectionItemsMap[targetCollectionID] {
-			UserCollcetionItemsArr = append(UserCollcetionItemsArr, &model.UserCollectionItem{
-				UserID:       userID,
-				CollectionID: targetCollectionID,
-			})
-			userCollectionItemsMap[targetCollectionID] = true // 格納後はtrueに変換する
-		}
-
-		log.Println("After insert", userCollectionItemsMap[targetCollectionID])
-
 		// ========== end of the loop ==============
 
 		// bulk insertの開始
