@@ -134,7 +134,15 @@ func HandleGachaPost() http.HandlerFunc {
 			itemCollectionMap[collectionItem.ID] = collectionItems[i]
 		}
 
-		// もしuser collectionのアイテムの重複していない場合はcollectionitemuserに格納する bulk insertでの実装？？
+		// user collectionの中で獲得されたアイテムの存在確認
+		if !userCollectionItemsMap[targetCollectionID] { // もしuser collectionのアイテムの重複していない場合はcollectionitemuserに格納する bulk insertでの実装？？
+			err = model.InsertUserCollectionItemByUserID(userID, targetCollectionID)
+			if err != nil {
+				log.Println("Failed to insert the new item into the user's collection", err)
+				response.InternalServerError(writer, "Internal Server Error")
+				return
+			}
+		}
 
 		// 共通処理は、responseに格納
 		gachaCollectionList := make([]*gachaResponse, 0, times)
@@ -142,23 +150,20 @@ func HandleGachaPost() http.HandlerFunc {
 			CollectionID: targetCollectionID,
 			Name:         itemCollectionMap[targetCollectionID].Name,
 			Rarity:       itemCollectionMap[targetCollectionID].Rarity,
-			IsNew:        userCollectionItemsMap[targetCollectionID], // 新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalse
+			IsNew:        !userCollectionItemsMap[targetCollectionID], // 新しく獲得したアイテムはisNewがtrue,既に持っているアイテムはisNewがfalse
 		})
 
-		// user collectionの中で獲得されたアイテムの存在確認
-
-		// もし、存在していない場合はinsert into usercollectionitem
-
 		//コイン消費（コインをマイナスにしてアップデート処理）
-		var coin int32
-		coin -= constant.GachaCoinConsumption
+		user.Coin -= constant.GachaCoinConsumption
+		err = model.UpdateCoinByPrimaryKey(userID, user.Coin)
+		if err != nil {
+			log.Println("Failed to update the user's coin", err)
+			response.InternalServerError(writer, "Internal Server Error")
+			return
+		}
 
 		response.Success(writer, &gachaListResponse{
 			Result: gachaCollectionList,
 		})
 	}
 }
-
-// TODO: model 書き込み
-// coin のアップデート
-// usercollectionitemへのインサート

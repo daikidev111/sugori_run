@@ -82,6 +82,15 @@ func UpdateCoinAndScoreByPrimaryKeyWithLock(tx *sql.Tx, userID string, highScore
 	return nil
 }
 
+// TODO: Add with Lock later!!!!!!!!!!!!!!!!
+func UpdateCoinByPrimaryKey(userID string, coin int32) error {
+	_, err := db.Conn.Exec(
+		"UPDATE user SET coin = ? WHERE id = ?",
+		coin, userID)
+
+	return err
+}
+
 // convertToUserForRanking rowデータをUserRankingsデータへ変換する
 func convertToUserForRanking(rows *sql.Rows) ([]*UserRanking, error) {
 	UserRankings := make([]*UserRanking, 0)
