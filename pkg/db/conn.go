@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -47,4 +48,30 @@ func init() {
 			"error=%+v",
 			user, password, host, port, database, err)
 	}
+}
+
+func Transact(ctx context.Context, db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		log.Printf("Begin is failed %v", err)
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			if err := tx.Rollback(); err != nil {
+				log.Printf("Rollback is failed %v", err)
+			}
+			panic(p)
+		} else if err != nil {
+			if err := tx.Rollback(); err != nil {
+				log.Printf("Rollback is failed %v", err)
+			}
+		} else {
+			if err := tx.Commit(); err != nil {
+				log.Printf("Commit is failed: %v", err)
+			}
+		}
+	}()
+	err = txFunc(tx)
+	return err
 }
