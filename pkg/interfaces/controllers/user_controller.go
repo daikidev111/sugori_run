@@ -30,7 +30,7 @@ func NewUserController(sqlHandler database.SqlHandler) *UserController {
 	}
 }
 
-func (controller *UserController) Show() http.HandlerFunc {
+func (controller *UserController) GetUser() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		ctx := request.Context()
 		userID := dcontext.GetUserIDFromContext(ctx)
@@ -39,7 +39,7 @@ func (controller *UserController) Show() http.HandlerFunc {
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
-		user, err := controller.Interactor.SelectUserByUserID(userID)
+		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
 
 		if err != nil {
 			log.Println(err)

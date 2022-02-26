@@ -6,7 +6,12 @@ type UserInteractor struct {
 	UserRepository UserRepository
 }
 
-func (interactor *UserInteractor) SelectUserByUserID(userID string) (user domain.User, err error) {
-	user, err = interactor.UserRepository.SelectUserByUserID(userID)
+func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (user domain.User, err error) {
+	user, err = interactor.UserRepository.SelectUserByPrimaryKey(userID)
+	return
+}
+
+func (interactor *UserInteractor) SelectUserByAuthToken(authToken string) (user domain.User, err error) {
+	user, err = interactor.UserRepository.SelectUserByAuthToken(authToken)
 	return
 }

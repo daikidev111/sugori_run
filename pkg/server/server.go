@@ -23,7 +23,7 @@ func Serve(addr string) {
 	// middleware を利用することでauth_tokenありきのoperationができるようになる
 
 	http.HandleFunc("/user/get",
-		get(middleware.Authenticate(userController.Show()))) // middleware.Authenticateでhandler funcを囲む
+		get(middleware.Authenticate(userController.GetUser()))) // middleware.Authenticateでhandler funcを囲む
 
 	http.HandleFunc("/user/update",
 		post(middleware.Authenticate(handler.HandleUserUpdate())))
