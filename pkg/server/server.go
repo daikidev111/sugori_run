@@ -16,14 +16,11 @@ func Serve(addr string) {
 	userController := controllers.NewUserController(infrastructure.NewSqlHandler())
 
 	/* ===== URLマッピングを行う ===== */
-	http.HandleFunc("/setting/get", get(handler.HandleSettingGet()))
-	http.HandleFunc("/user/create", post(handler.HandleUserCreate()))
-
-	// middlewareは 22dojo-online/pkg/http/middleware パッケージを利用する
-	// middleware を利用することでauth_tokenありきのoperationができるようになる
-
+	http.HandleFunc("/setting/get", get(controllers.GetSetting()))
 	http.HandleFunc("/user/get",
 		get(middleware.Authenticate(userController.GetUser()))) // middleware.Authenticateでhandler funcを囲む
+
+	http.HandleFunc("/user/create", post(handler.HandleUserCreate()))
 
 	http.HandleFunc("/user/update",
 		post(middleware.Authenticate(handler.HandleUserUpdate())))
