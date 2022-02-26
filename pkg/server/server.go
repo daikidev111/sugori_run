@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -12,18 +13,22 @@ import (
 
 // Serve HTTPサーバを起動する
 func Serve(addr string) {
+	var db *sql.DB
+	m := middleware.NewAuth(db)
 
 	userController := controllers.NewUserController(infrastructure.NewSqlHandler())
 
 	/* ===== URLマッピングを行う ===== */
 	http.HandleFunc("/setting/get", get(controllers.GetSetting()))
 	http.HandleFunc("/user/get",
-		get(middleware.Authenticate(userController.GetUser()))) // middleware.Authenticateでhandler funcを囲む
+		get(m.Authenticate(userController.GetUser()))) // middleware.Authenticateでhandler funcを囲む
+	// http.HandleFunc("/user/get",
+	// 	get(middleware.Authenticate(handler.HandleUserGet()))) // middleware.Authenticateでhandler funcを囲む
 
 	http.HandleFunc("/user/create", post(handler.HandleUserCreate()))
 
 	http.HandleFunc("/user/update",
-		post(middleware.Authenticate(handler.HandleUserUpdate())))
+		post(handler.HandleUserUpdate()))
 
 	/* ===== サーバの起動 ===== */
 	log.Println("Server running...")
