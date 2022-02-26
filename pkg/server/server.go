@@ -22,16 +22,13 @@ func Serve(addr string) {
 
 	/* ===== URLマッピングを行う ===== */
 	http.HandleFunc("/setting/get", get(controllers.GetSetting()))
+
 	http.HandleFunc("/user/get",
-		get(m.Authenticate(userController.GetUser()))) // middleware.Authenticateでhandler funcを囲む
-
-	// http.HandleFunc("/user/get",
-	// 	get(middleware.Authenticate(handler.HandleUserGet()))) // middleware.Authenticateでhandler funcを囲む
-
-	// http.HandleFunc("/user/create", post(handler.HandleUserCreate()))
-
-	// http.HandleFunc("/user/update",
-	// 	post(handler.HandleUserUpdate()))
+		get(m.Authenticate(userController.GetUser())))
+	http.HandleFunc("/user/create",
+		post(userController.InsertUser()))
+	http.HandleFunc("/user/update",
+		post(m.Authenticate(userController.UpdateUser())))
 
 	/* ===== サーバの起動 ===== */
 	log.Println("Server running...")

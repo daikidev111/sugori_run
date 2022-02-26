@@ -9,10 +9,10 @@ type UserInteractor struct {
 	UserRepository UserRepository
 }
 
-func NewUserInteractor(sqlHandler database.SqlHandler) *UserInteractor {
+func NewUserInteractor(sqlHandler database.SQLHandler) *UserInteractor {
 	return &UserInteractor{
 		UserRepository: &database.UserRepository{
-			SqlHandler: sqlHandler,
+			SQLHandler: sqlHandler,
 		},
 	}
 }
@@ -24,5 +24,15 @@ func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (user do
 
 func (interactor *UserInteractor) SelectUserByAuthToken(authToken string) (user domain.User, err error) {
 	user, err = interactor.UserRepository.SelectUserByAuthToken(authToken)
+	return
+}
+
+func (interactor *UserInteractor) InsertUser(user domain.User) (err error) {
+	err = interactor.UserRepository.InsertUser(user)
+	return
+}
+
+func (interactor *UserInteractor) UpdateUserByPrimaryKey(user domain.User) (err error) {
+	err = interactor.UserRepository.UpdateUserByPrimaryKey(user)
 	return
 }

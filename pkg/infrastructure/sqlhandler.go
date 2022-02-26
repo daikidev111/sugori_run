@@ -1,12 +1,13 @@
 package infrastructure
 
 import (
-	"22dojo-online/pkg/interfaces/database"
 	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"os"
+
+	"22dojo-online/pkg/interfaces/database"
 
 	_ "github.com/go-sql-driver/mysql"
 )

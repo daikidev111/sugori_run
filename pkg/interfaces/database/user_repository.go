@@ -5,7 +5,7 @@ import (
 )
 
 type UserRepository struct {
-	SqlHandler
+	SQLHandler
 }
 
 // SelectUserByPrimaryKey auth_tokenを条件にレコードを取得する
@@ -60,4 +60,18 @@ func (repo *UserRepository) SelectUserByAuthToken(authToken string) (user domain
 	user.Coin = coin
 
 	return
+}
+
+func (repo *UserRepository) InsertUser(user domain.User) error {
+	_, err := repo.Execute(
+		"INSERT INTO `user` (`id`, `auth_token`, `name`, `high_score`, `coin`) VALUES (?, ?, ?, ?, ?);",
+		user.ID, user.AuthToken, user.Name, user.HighScore, user.Coin)
+	return err
+}
+
+func (repo *UserRepository) UpdateUserByPrimaryKey(user domain.User) error {
+	_, err := repo.Execute(
+		"UPDATE user SET name = ? WHERE id = ?",
+		user.Name, user.ID)
+	return err
 }
