@@ -20,9 +20,6 @@ func NewAuth(UserInteractor *usecase.UserInteractor) *Auth {
 }
 
 func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
-
-	// Authenticate ユーザ認証を行ってContextへユーザID情報を保存する
-	// func Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		ctx := request.Context()
 		if ctx == nil {
@@ -35,7 +32,6 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			log.Println("x-token is empty")
 			return
 		}
-		log.Println(token)
 
 		user, err := auth.UserInteractor.SelectUserByAuthToken(token)
 		if err != nil {
