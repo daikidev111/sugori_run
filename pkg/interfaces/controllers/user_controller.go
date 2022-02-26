@@ -1,14 +1,15 @@
 package controllers
 
 import (
+	"encoding/json"
+	"log"
+	"net/http"
+
 	"22dojo-online/pkg/dcontext"
 	"22dojo-online/pkg/domain"
 	"22dojo-online/pkg/http/response"
 	"22dojo-online/pkg/interfaces/database"
 	"22dojo-online/pkg/usecase"
-	"encoding/json"
-	"log"
-	"net/http"
 
 	"github.com/google/uuid"
 )

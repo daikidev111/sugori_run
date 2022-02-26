@@ -15,11 +15,11 @@ import (
 // Driver名
 const driverName = "mysql"
 
-type SqlHandler struct {
+type SQLHandler struct {
 	Conn *sql.DB // Conn 各repositoryで利用するDB接続(Connection)情報
 }
 
-func NewSqlHandler() *SqlHandler {
+func NewSQLHandler() *SQLHandler {
 	/* ===== データベースへ接続する. ===== */
 	// ユーザ
 	user := os.Getenv("MYSQL_USER")
@@ -30,13 +30,13 @@ func NewSqlHandler() *SqlHandler {
 	// 接続先ポート
 	port := os.Getenv("MYSQL_PORT")
 	// 接続先データベース
-	database := os.Getenv("MYSQL_DATABASE")
+	db := os.Getenv("MYSQL_DATABASE")
 
 	// 接続情報は以下のように指定する.
 	// user:password@tcp(host:port)/database
 	var err error
 	conn, err := sql.Open(driverName,
-		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, database))
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, db))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,9 +48,9 @@ func NewSqlHandler() *SqlHandler {
 			"MYSQL_PORT=%s, "+
 			"MYSQL_DATABASE=%s, "+
 			"error=%+v",
-			user, password, host, port, database, err)
+			user, password, host, port, db, err)
 	}
-	sqlHandler := new(SqlHandler)
+	sqlHandler := new(SQLHandler)
 	sqlHandler.Conn = conn
 	return sqlHandler
 }
@@ -82,8 +82,8 @@ func Transact(ctx context.Context, db *sql.DB, txFunc func(*sql.Tx) error) (err 
 	return err
 }
 
-func (handler *SqlHandler) Execute(statement string, args ...interface{}) (database.Result, error) {
-	res := SqlResult{}
+func (handler *SQLHandler) Execute(statement string, args ...interface{}) (database.Result, error) {
+	res := SQLResult{}
 	result, err := handler.Conn.Exec(statement, args...)
 	if err != nil {
 		return res, err
@@ -92,40 +92,40 @@ func (handler *SqlHandler) Execute(statement string, args ...interface{}) (datab
 	return res, nil
 }
 
-func (handler *SqlHandler) Query(statement string, args ...interface{}) (database.Row, error) {
+func (handler *SQLHandler) Query(statement string, args ...interface{}) (database.Row, error) {
 	rows, err := handler.Conn.Query(statement, args...)
 	if err != nil {
-		return new(SqlRow), err
+		return new(SQLRow), err
 	}
-	row := new(SqlRow)
+	row := new(SQLRow)
 	row.Rows = rows
 	return row, nil
 }
 
-type SqlResult struct {
+type SQLResult struct {
 	Result sql.Result
 }
 
-func (r SqlResult) LastInsertId() (int64, error) {
+func (r SQLResult) LastInsertId() (int64, error) {
 	return r.Result.LastInsertId()
 }
 
-func (r SqlResult) RowsAffected() (int64, error) {
+func (r SQLResult) RowsAffected() (int64, error) {
 	return r.Result.RowsAffected()
 }
 
-type SqlRow struct {
+type SQLRow struct {
 	Rows *sql.Rows
 }
 
-func (r SqlRow) Scan(dest ...interface{}) error {
+func (r SQLRow) Scan(dest ...interface{}) error {
 	return r.Rows.Scan(dest...)
 }
 
-func (r SqlRow) Next() bool {
+func (r SQLRow) Next() bool {
 	return r.Rows.Next()
 }
 
-func (r SqlRow) Close() error {
+func (r SQLRow) Close() error {
 	return r.Rows.Close()
 }

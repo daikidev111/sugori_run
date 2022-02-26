@@ -1,21 +1,22 @@
 package middleware
 
 import (
-	"22dojo-online/pkg/dcontext"
-	"22dojo-online/pkg/http/response"
-	"22dojo-online/pkg/usecase"
 	"context"
 	"log"
 	"net/http"
+
+	"22dojo-online/pkg/dcontext"
+	"22dojo-online/pkg/http/response"
+	"22dojo-online/pkg/usecase"
 )
 
 type Auth struct {
-	UserInteractor *usecase.UserInteractor
+	userInteractor *usecase.UserInteractor
 }
 
-func NewAuth(UserInteractor *usecase.UserInteractor) *Auth {
+func NewAuth(userInteractor *usecase.UserInteractor) *Auth {
 	return &Auth{
-		UserInteractor: UserInteractor,
+		userInteractor: userInteractor,
 	}
 }
 
@@ -33,7 +34,7 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		user, err := auth.UserInteractor.SelectUserByAuthToken(token)
+		user, err := auth.userInteractor.SelectUserByAuthToken(token)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")

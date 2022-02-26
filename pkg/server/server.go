@@ -16,8 +16,8 @@ func Serve(addr string) {
 
 	// m := middleware.NewAuth(db)
 
-	userController := controllers.NewUserController(infrastructure.NewSqlHandler())
-	UserInteractor := usecase.NewUserInteractor(infrastructure.NewSqlHandler())
+	userController := controllers.NewUserController(infrastructure.NewSQLHandler())
+	UserInteractor := usecase.NewUserInteractor(infrastructure.NewSQLHandler())
 	m := middleware.NewAuth(UserInteractor)
 
 	/* ===== URLマッピングを行う ===== */
