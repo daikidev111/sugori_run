@@ -5,31 +5,28 @@ import (
 	"net/http"
 
 	"22dojo-online/pkg/http/middleware"
+	"22dojo-online/pkg/infrastructure"
+	"22dojo-online/pkg/interfaces/controllers"
 	"22dojo-online/pkg/server/handler"
 )
 
 // Serve HTTPサーバを起動する
 func Serve(addr string) {
+
+	userController := controllers.NewUserController(infrastructure.NewSqlHandler())
+
 	/* ===== URLマッピングを行う ===== */
 	http.HandleFunc("/setting/get", get(handler.HandleSettingGet()))
 	http.HandleFunc("/user/create", post(handler.HandleUserCreate()))
 
 	// middlewareは 22dojo-online/pkg/http/middleware パッケージを利用する
 	// middleware を利用することでauth_tokenありきのoperationができるようになる
+
 	http.HandleFunc("/user/get",
-		get(middleware.Authenticate(handler.HandleUserGet()))) // middleware.Authenticateでhandler funcを囲む
+		get(middleware.Authenticate(userController.Show()))) // middleware.Authenticateでhandler funcを囲む
+
 	http.HandleFunc("/user/update",
 		post(middleware.Authenticate(handler.HandleUserUpdate())))
-
-	// Collection List の表示の際のhttp handler
-	http.HandleFunc("/collection/list",
-		get(middleware.Authenticate(handler.HandleCollectionGet())))
-
-	http.HandleFunc("/ranking/list",
-		get(middleware.Authenticate(handler.HandleRankingGet())))
-
-	http.HandleFunc("/game/finish",
-		post(middleware.Authenticate(handler.HandleGameFinishPost())))
 
 	/* ===== サーバの起動 ===== */
 	log.Println("Server running...")
