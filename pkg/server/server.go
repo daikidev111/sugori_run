@@ -1,34 +1,37 @@
 package server
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
 	"22dojo-online/pkg/http/middleware"
 	"22dojo-online/pkg/infrastructure"
 	"22dojo-online/pkg/interfaces/controllers"
-	"22dojo-online/pkg/server/handler"
+	"22dojo-online/pkg/usecase"
 )
 
 // Serve HTTPサーバを起動する
 func Serve(addr string) {
-	var db *sql.DB
-	m := middleware.NewAuth(db)
+	// var db *sql.DB
+
+	// m := middleware.NewAuth(db)
 
 	userController := controllers.NewUserController(infrastructure.NewSqlHandler())
+	UserInteractor := usecase.NewUserInteractor(infrastructure.NewSqlHandler())
+	m := middleware.NewAuth(UserInteractor)
 
 	/* ===== URLマッピングを行う ===== */
 	http.HandleFunc("/setting/get", get(controllers.GetSetting()))
 	http.HandleFunc("/user/get",
 		get(m.Authenticate(userController.GetUser()))) // middleware.Authenticateでhandler funcを囲む
+
 	// http.HandleFunc("/user/get",
 	// 	get(middleware.Authenticate(handler.HandleUserGet()))) // middleware.Authenticateでhandler funcを囲む
 
-	http.HandleFunc("/user/create", post(handler.HandleUserCreate()))
+	// http.HandleFunc("/user/create", post(handler.HandleUserCreate()))
 
-	http.HandleFunc("/user/update",
-		post(handler.HandleUserUpdate()))
+	// http.HandleFunc("/user/update",
+	// 	post(handler.HandleUserUpdate()))
 
 	/* ===== サーバの起動 ===== */
 	log.Println("Server running...")

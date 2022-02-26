@@ -1,28 +1,24 @@
 package middleware
 
 import (
+	"22dojo-online/pkg/dcontext"
+	"22dojo-online/pkg/http/response"
+	"22dojo-online/pkg/usecase"
 	"context"
-	"database/sql"
 	"log"
 	"net/http"
-
-	"22dojo-online/pkg/db"
-	"22dojo-online/pkg/dcontext"
-	"22dojo-online/pkg/domain"
-	"22dojo-online/pkg/http/response"
 )
 
 type Auth struct {
-	db *sql.DB
+	UserInteractor *usecase.UserInteractor
 }
 
-func NewAuth(db *sql.DB) *Auth {
+func NewAuth(UserInteractor *usecase.UserInteractor) *Auth {
 	return &Auth{
-		db: db,
+		UserInteractor: UserInteractor,
 	}
 }
 
-// ここがSQLに依存しているのでここをどう対応するか考えないといけない
 func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 
 	// Authenticate ユーザ認証を行ってContextへユーザID情報を保存する
@@ -39,16 +35,12 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			log.Println("x-token is empty")
 			return
 		}
+		log.Println(token)
 
-		row := db.Conn.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `auth_token`=?", token)
-
-		user := domain.User{}
-		err := row.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin)
+		user, err := auth.UserInteractor.SelectUserByAuthToken(token)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				return
-			}
 			log.Println(err)
+			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 
