@@ -1,14 +1,10 @@
 package database
 
-import (
-	"database/sql"
-)
-
 type SQLHandler interface {
 	Execute(string, ...interface{}) (Result, error)
 	Query(string, ...interface{}) (Rows, error)
 	QueryRow(string, ...interface{}) Row
-	Prepare(string, ...interface{}) (*sql.Stmt, error)
+	// Prepare(string, ...interface{}) (*sql.Stmt, error)
 }
 
 type Result interface {
