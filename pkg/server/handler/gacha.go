@@ -68,7 +68,7 @@ func HandleGachaPost() http.HandlerFunc {
 			return
 		}
 		if len(collectionItems) == 0 {
-			log.Println("A collection of items is not found")
+			log.Println("A collection of items is empty")
 			response.BadRequest(writer, "A collection of items is not found.")
 			return
 		}
@@ -90,20 +90,21 @@ func HandleGachaPost() http.HandlerFunc {
 		err = db.Transact(ctx, db.Conn, func(tx *sql.Tx) error {
 			user, err := model.SelectUserByPrimaryKeyWithLock(userID, tx)
 			if err != nil {
-				log.Println(err)
+				log.Println("SelectUserByPrimaryKeyWithLock: Failed to fetch a row of the user's information")
 				response.InternalServerError(writer, "Internal Server Error")
 				return err
 			}
 
 			times := int32(requestBody.Times)
 			if user.Coin < constant.GachaCoinConsumption*times {
-				log.Println("The amount of coins the user has is less than the consumption of coin for the gacha draw")
+				log.Println("Not enough coins")
 				response.BadRequest(writer, "Invalid gacha draw")
 				return err
 			}
 
 			userCollectionItems, err := model.SelectUserCollectionItemByUserIDWithLock(tx, userID)
 			if err != nil {
+				log.Println("SelectUserCollectionItemByUserIDWithLock: Failed to fetch rows from the user collection item")
 				log.Println(err)
 				response.InternalServerError(writer, "Internal Server Error")
 				return err
@@ -154,7 +155,7 @@ func HandleGachaPost() http.HandlerFunc {
 			user.Coin -= constant.GachaCoinConsumption * times
 			err = model.UpdateCoinAndScoreByPrimaryKeyWithLock(tx, userID, user.HighScore, user.Coin)
 			if err != nil {
-				log.Println("Failed to update the user's coin", err)
+				log.Println("UpdateCoinAndScoreByPrimaryKeyWithLock: Failed to update the user's coin", err)
 				response.InternalServerError(writer, "Internal Server Error")
 				return err
 			}
@@ -163,7 +164,7 @@ func HandleGachaPost() http.HandlerFunc {
 			if len(UserCollectionItemsArr) > 0 {
 				err = model.InsertUserCollectionItemsByUserIDWithLock(tx, UserCollectionItemsArr)
 				if err != nil {
-					log.Println("Failed to insert the new item(s) into the user's collection", err)
+					log.Println("InsertUserCollectionItemsByUserIDWithLock: Failed to insert the new item(s) into the user's collection", err)
 					response.InternalServerError(writer, "Internal Server Error")
 					return err
 				}
@@ -171,7 +172,7 @@ func HandleGachaPost() http.HandlerFunc {
 			return nil
 		})
 		if err != nil { // トランザクションが失敗した場合
-			log.Println("DB Transaction failed: ")
+			log.Println("DB Transaction failed or a query with the lock failed to execute. Rollback the transaction.")
 			log.Println(err)
 			response.BadRequest(writer, "Internal Server Error")
 			return
