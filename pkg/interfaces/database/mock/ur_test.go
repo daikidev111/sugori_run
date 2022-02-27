@@ -28,7 +28,7 @@ func TestSelectUserByPrimaryKey(t *testing.T) {
 		err      error
 	}{
 		{
-			"success",
+			"Testing SelectUserByPrimaryKey from pkg/interfaces/database/user_repository.go",
 			"78164dcf-6b7c-45e4-862a-2a0f6735a449",
 			domain.User{
 				ID:        "78164dcf-6b7c-45e4-862a-2a0f6735a449",
@@ -61,6 +61,8 @@ func TestSelectUserByPrimaryKey(t *testing.T) {
 				"auth_token", "name", "high_score", "coin",
 			}).AddRow(b.AuthToken, b.Name, b.HighScore, b.Coin)
 			mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(tt.id).WillReturnRows(rows)
+			// ExpectQuery expects Query() or QueryRow() to be called with expectedSQL query.
+			// the *ExpectedQuery allows to mock database response.
 
 			got, err := repo.SelectUserByPrimaryKey(b.ID)
 
