@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -55,32 +54,32 @@ func NewSQLHandler() *SQLHandler {
 	return sqlHandler
 }
 
-// TODO: Make it abstract ...?
-func Transact(ctx context.Context, db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
-	tx, err := db.BeginTx(ctx, nil)
-	if err != nil {
-		log.Printf("Begin is failed %v", err)
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			if err := tx.Rollback(); err != nil {
-				log.Printf("Rollback is failed %v", err)
-			}
-			panic(p)
-		} else if err != nil {
-			if err := tx.Rollback(); err != nil {
-				log.Printf("Rollback is failed %v", err)
-			}
-		} else {
-			if err := tx.Commit(); err != nil {
-				log.Printf("Commit is failed: %v", err)
-			}
-		}
-	}()
-	err = txFunc(tx)
-	return err
-}
+// // TODO: Make it abstract ...?
+// func Transact(ctx context.Context, db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
+// 	tx, err := db.BeginTx(ctx, nil)
+// 	if err != nil {
+// 		log.Printf("Begin is failed %v", err)
+// 		return err
+// 	}
+// 	defer func() {
+// 		if p := recover(); p != nil {
+// 			if err := tx.Rollback(); err != nil {
+// 				log.Printf("Rollback is failed %v", err)
+// 			}
+// 			panic(p)
+// 		} else if err != nil {
+// 			if err := tx.Rollback(); err != nil {
+// 				log.Printf("Rollback is failed %v", err)
+// 			}
+// 		} else {
+// 			if err := tx.Commit(); err != nil {
+// 				log.Printf("Commit is failed: %v", err)
+// 			}
+// 		}
+// 	}()
+// 	err = txFunc(tx)
+// 	return err
+// }
 
 func (handler *SQLHandler) Execute(statement string, args ...interface{}) (database.Result, error) {
 	res := SQLResult{}
@@ -92,14 +91,21 @@ func (handler *SQLHandler) Execute(statement string, args ...interface{}) (datab
 	return res, nil
 }
 
-func (handler *SQLHandler) Query(statement string, args ...interface{}) (database.Row, error) {
+func (handler *SQLHandler) Query(statement string, args ...interface{}) (database.Rows, error) {
 	rows, err := handler.Conn.Query(statement, args...)
 	if err != nil {
-		return new(SQLRow), err
+		return new(SQLRows), err
 	}
-	row := new(SQLRow)
+	row := new(SQLRows)
 	row.Rows = rows
 	return row, nil
+}
+
+func (handler *SQLHandler) QueryRow(statement string, args ...interface{}) database.Row {
+	queryRow := handler.Conn.QueryRow(statement, args...)
+	row := new(SQLRow)
+	row.Row = queryRow
+	return row
 }
 
 type SQLResult struct {
@@ -114,18 +120,30 @@ func (r SQLResult) RowsAffected() (int64, error) {
 	return r.Result.RowsAffected()
 }
 
-type SQLRow struct {
+type SQLRows struct {
 	Rows *sql.Rows
 }
 
-func (r SQLRow) Scan(dest ...interface{}) error {
+type SQLRow struct {
+	Row *sql.Row
+}
+
+func (r SQLRows) Scan(dest ...interface{}) error {
 	return r.Rows.Scan(dest...)
 }
 
-func (r SQLRow) Next() bool {
+func (r SQLRows) Next() bool {
 	return r.Rows.Next()
 }
 
-func (r SQLRow) Close() error {
+func (r SQLRows) Close() error {
 	return r.Rows.Close()
+}
+
+func (r SQLRow) Scan(dest ...interface{}) error {
+	return r.Row.Scan(dest...)
+}
+
+func (r SQLRow) Err() error {
+	return r.Row.Err()
 }
