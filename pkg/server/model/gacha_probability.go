@@ -24,7 +24,7 @@ func SelectAllCollectionItemProbability() ([]*GachaProbability, error) {
 	return convertToGachaProbability(rows)
 }
 
-// convertToCollectionItemでrowデータをCollectionItemデータへ変換する
+// cconvertToGachaProbabilityでrowデータをGachaProbabilityデータへ変換する
 func convertToGachaProbability(rows *sql.Rows) ([]*GachaProbability, error) {
 	GachaProbabilityList := make([]*GachaProbability, 0)
 

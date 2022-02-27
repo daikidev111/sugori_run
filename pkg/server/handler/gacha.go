@@ -21,7 +21,7 @@ type gachaResponse struct {
 	IsNew        bool   `json:"isNew"`
 }
 
-type GachaListResponse struct {
+type gachaListResponse struct {
 	Result []*gachaResponse `json:"results"`
 }
 
@@ -29,7 +29,7 @@ type gachaRequest struct {
 	Times int `json:"times"`
 }
 
-// HandleCollectionGet
+// HandleGachaPost
 func HandleGachaPost() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		var requestBody gachaRequest
@@ -54,7 +54,12 @@ func HandleGachaPost() http.HandlerFunc {
 			return
 		}
 
-		gachaCollectionList := make([]*gachaResponse, 0, requestBody.Times) // Response用のスライス
+		gachaProbabilities, err := model.SelectAllCollectionItemProbability()
+		if err != nil {
+			log.Println(err)
+			response.InternalServerError(writer, "Internal Server Error")
+			return
+		}
 
 		collectionItems, err := model.SelectAllCollectionItems()
 		if err != nil {
@@ -68,6 +73,7 @@ func HandleGachaPost() http.HandlerFunc {
 			return
 		}
 
+		gachaCollectionList := make([]*gachaResponse, 0, requestBody.Times)               // Response用のスライス
 		itemCollectionMap := make(map[string]*model.CollectionItem, len(collectionItems)) // itemCollectionのマップ
 
 		// IDのキーと格アイテムの情報が入っている静的マップの生成
@@ -75,19 +81,12 @@ func HandleGachaPost() http.HandlerFunc {
 			itemCollectionMap[collectionItem.ID] = collectionItems[i]
 		}
 
-		gachaProbabilities, err := model.SelectAllCollectionItemProbability()
-		if err != nil {
-			log.Println(err)
-			response.InternalServerError(writer, "Internal Server Error")
-			return
-		}
-
 		var SumOfRatio int
 		for _, gachaProb := range gachaProbabilities {
 			SumOfRatio += gachaProb.Ratio
 		}
 
-		// トランザクションをここから開始する
+		// トランザクション開始
 		err = db.Transact(ctx, db.Conn, func(tx *sql.Tx) error {
 			user, err := model.SelectUserByPrimaryKeyWithLock(userID, tx)
 			if err != nil {
@@ -122,11 +121,9 @@ func HandleGachaPost() http.HandlerFunc {
 			for i := 0; i < requestBody.Times; i++ {
 				randInt := rand.Intn(SumOfRatio) // 乱数の取得
 
-				var targetRatio int           // Ratioから取得される値を足す際に必要
-				var targetCollectionID string // 乱数を越した際のcollection ID(ガチャの引きアイテム)
-
-				// ガチャで排出確率に基づいたコレクションアイテムの取得
-				for _, gachaProb := range gachaProbabilities {
+				var targetRatio int                            // Ratioから取得される値を足す際に必要
+				var targetCollectionID string                  // 乱数を越した際のcollection ID(ガチャの引きアイテム)
+				for _, gachaProb := range gachaProbabilities { // ガチャで排出確率に基づいたコレクションアイテムの取得
 					targetRatio += gachaProb.Ratio
 					if targetRatio > randInt {
 						targetCollectionID = gachaProb.CollectionID
@@ -153,16 +150,6 @@ func HandleGachaPost() http.HandlerFunc {
 			}
 			// ========== end of the loop ==============
 
-			// bulk insertの開始
-			if len(UserCollectionItemsArr) > 0 {
-				err = model.InsertUserCollectionItemsByUserIDWithLock(tx, UserCollectionItemsArr)
-				if err != nil {
-					log.Println("Failed to insert the new item into the user's collection", err)
-					response.InternalServerError(writer, "Internal Server Error")
-					return err
-				}
-			}
-
 			// コイン消費（コインをマイナスにしてアップデート処理）
 			user.Coin -= constant.GachaCoinConsumption * times
 			err = model.UpdateCoinAndScoreByPrimaryKeyWithLock(tx, userID, user.HighScore, user.Coin)
@@ -170,6 +157,16 @@ func HandleGachaPost() http.HandlerFunc {
 				log.Println("Failed to update the user's coin", err)
 				response.InternalServerError(writer, "Internal Server Error")
 				return err
+			}
+
+			// bulk insertの開始
+			if len(UserCollectionItemsArr) > 0 {
+				err = model.InsertUserCollectionItemsByUserIDWithLock(tx, UserCollectionItemsArr)
+				if err != nil {
+					log.Println("Failed to insert the new item(s) into the user's collection", err)
+					response.InternalServerError(writer, "Internal Server Error")
+					return err
+				}
 			}
 			return nil
 		})
@@ -181,7 +178,7 @@ func HandleGachaPost() http.HandlerFunc {
 		}
 
 		// responseを返す
-		response.Success(writer, &GachaListResponse{
+		response.Success(writer, &gachaListResponse{
 			Result: gachaCollectionList,
 		})
 	}

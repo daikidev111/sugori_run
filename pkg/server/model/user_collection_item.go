@@ -43,8 +43,7 @@ func InsertUserCollectionItemsByUserIDWithLock(tx *sql.Tx, userCollectionItems [
 	}
 	stmt := fmt.Sprintf("INSERT INTO user_collection_item (user_id, collection_item_id) VALUES %s",
 		strings.Join(valueStrings, ","))
-	_, err := tx.Exec(stmt, valueArgs...) // call Statusln with a variable number of arguments
-	// maybe remove statusln and directly access to the index of the arrays
+	_, err := tx.Exec(stmt, valueArgs...)
 	return err
 }
 
