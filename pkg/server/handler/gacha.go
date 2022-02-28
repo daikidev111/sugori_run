@@ -82,11 +82,6 @@ func HandleGachaPost() http.HandlerFunc {
 			itemCollectionMap[collectionItem.ID] = collectionItems[i]
 		}
 
-		var sumOfRatio int
-		for _, gachaProb := range gachaProbabilities {
-			sumOfRatio += gachaProb.Ratio
-		}
-
 		// トランザクション開始
 		err = db.Transact(ctx, db.Conn, func(tx *sql.Tx) error {
 			user, err := model.SelectUserByPrimaryKeyWithLock(userID, tx)
@@ -117,6 +112,11 @@ func HandleGachaPost() http.HandlerFunc {
 			// すでに所持しているかをIDを突き合わせて判定するためのマップ(動的）
 			for _, userCollectionItem := range userCollectionItems {
 				userCollectionItemsMap[userCollectionItem.CollectionID] = true
+			}
+
+			var sumOfRatio int
+			for _, gachaProb := range gachaProbabilities {
+				sumOfRatio += gachaProb.Ratio
 			}
 
 			// =========== start of the loop ===================
