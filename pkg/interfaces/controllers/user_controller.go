@@ -9,6 +9,7 @@ import (
 	"22dojo-online/pkg/dcontext"
 	"22dojo-online/pkg/domain"
 	"22dojo-online/pkg/http/response"
+	handler "22dojo-online/pkg/interfaces/Handler"
 	"22dojo-online/pkg/interfaces/database"
 	"22dojo-online/pkg/usecase"
 
@@ -71,12 +72,8 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 			return
 		}
 
-		response.Success(writer, &userGetResponse{
-			ID:        user.ID,
-			Name:      user.Name,
-			HighScore: user.HighScore,
-			Coin:      user.Coin,
-		})
+		k := handler.New()
+		k.GetUserHandler(writer, user)
 	}
 }
 func (controller *UserController) InsertUser() http.HandlerFunc {
