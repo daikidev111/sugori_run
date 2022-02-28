@@ -103,7 +103,7 @@ func HandleGachaPost() http.HandlerFunc {
 				return err
 			}
 
-			userCollectionItems, err := model.SelectUserCollectionItemByUserIDWithLock(tx, userID)
+			userCollectionItems, err := model.SelectUserCollectionItemByUserID(userID)
 			if err != nil {
 				log.Println("SelectUserCollectionItemByUserIDWithLock: Failed to fetch rows from the user collection item")
 				log.Println(err)

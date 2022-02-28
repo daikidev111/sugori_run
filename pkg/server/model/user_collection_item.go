@@ -24,15 +24,6 @@ func SelectUserCollectionItemByUserID(userID string) ([]*UserCollectionItem, err
 	return convertToUserCollectionItems(rows)
 }
 
-func SelectUserCollectionItemByUserIDWithLock(tx *sql.Tx, userID string) ([]*UserCollectionItem, error) {
-	rows, err := tx.Query("SELECT user_id, collection_item_id FROM user_collection_item where user_id = ? FOR UPDATE;", userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return convertToUserCollectionItems(rows)
-}
-
 func InsertUserCollectionItemsByUserIDWithLock(tx *sql.Tx, userCollectionItems []*UserCollectionItem) error {
 	valueStrings := make([]string, 0, len(userCollectionItems))
 	valueArgs := make([]interface{}, 0, len(userCollectionItems)*2)
