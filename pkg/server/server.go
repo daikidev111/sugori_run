@@ -6,7 +6,7 @@ import (
 
 	"22dojo-online/pkg/infrastructure"
 	"22dojo-online/pkg/interfaces/controllers"
-	"22dojo-online/pkg/middleware"
+	"22dojo-online/pkg/interfaces/middleware"
 	"22dojo-online/pkg/usecase"
 )
 
