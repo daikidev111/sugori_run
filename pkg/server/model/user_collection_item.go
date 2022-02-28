@@ -31,8 +31,11 @@ func InsertUserCollectionItemsByUserIDWithLock(tx *sql.Tx, userCollectionItems [
 		valueStrings = append(valueStrings, "(?, ?)")
 		valueArgs = append(valueArgs, userCollectionItem.UserID, userCollectionItem.CollectionID)
 	}
-	stmt := fmt.Sprintf("INSERT INTO user_collection_item (user_id, collection_item_id) VALUES %s",
-		strings.Join(valueStrings, ","))
+
+	var sb strings.Builder
+	fmt.Fprintf(&sb, "INSERT INTO user_collection_item (user_id, collection_item_id) VALUES %s", strings.Join(valueStrings, ","))
+	stmt := sb.String()
+
 	_, err := tx.Exec(stmt, valueArgs...)
 	return err
 }
