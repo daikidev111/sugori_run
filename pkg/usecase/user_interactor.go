@@ -17,22 +17,22 @@ func NewUserInteractor(sqlHandler database.SQLHandler) *UserInteractor {
 	}
 }
 
-func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (user domain.User, err error) {
+func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (user *domain.User, err error) {
 	user, err = interactor.UserRepository.SelectUserByPrimaryKey(userID)
 	return
 }
 
-func (interactor *UserInteractor) SelectUserByAuthToken(authToken string) (user domain.User, err error) {
+func (interactor *UserInteractor) SelectUserByAuthToken(authToken string) (user *domain.User, err error) {
 	user, err = interactor.UserRepository.SelectUserByAuthToken(authToken)
 	return
 }
 
-func (interactor *UserInteractor) InsertUser(user domain.User) (err error) {
+func (interactor *UserInteractor) InsertUser(user *domain.User) (err error) {
 	err = interactor.UserRepository.InsertUser(user)
 	return
 }
 
-func (interactor *UserInteractor) UpdateUserByPrimaryKey(user domain.User) (err error) {
+func (interactor *UserInteractor) UpdateUserByPrimaryKey(user *domain.User) (err error) {
 	err = interactor.UserRepository.UpdateUserByPrimaryKey(user)
 	return
 }

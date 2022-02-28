@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"22dojo-online/pkg/dcontext"
+	"22dojo-online/pkg/domain"
 	"22dojo-online/pkg/http/response"
 	"22dojo-online/pkg/usecase"
 )
@@ -34,7 +35,9 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		user, err := auth.userInteractor.SelectUserByAuthToken(token)
+		var user *domain.User
+		var err error
+		user, err = auth.userInteractor.SelectUserByAuthToken(token)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")

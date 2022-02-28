@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -56,6 +57,7 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
+		var user *domain.User
 		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
 
 		if err != nil {
@@ -63,6 +65,12 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
+		if user == nil {
+			log.Println("user not found")
+			response.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
+			return
+		}
+
 		response.Success(writer, &userGetResponse{
 			ID:        user.ID,
 			Name:      user.Name,
@@ -71,7 +79,6 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 		})
 	}
 }
-
 func (controller *UserController) InsertUser() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		// リクエストBodyから更新後情報を取得
@@ -99,7 +106,7 @@ func (controller *UserController) InsertUser() http.HandlerFunc {
 		}
 
 		// データベースにユーザデータを登録する
-		err = controller.Interactor.InsertUser(domain.User{
+		err = controller.Interactor.InsertUser(&domain.User{
 			ID:        userID.String(),
 			AuthToken: authToken.String(),
 			Name:      requestBody.Name,
@@ -136,19 +143,20 @@ func (controller *UserController) UpdateUser() http.HandlerFunc {
 			return
 		}
 
-		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
+		var user *domain.User
+		var err error
+		user, err = controller.Interactor.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
+		if user == nil {
+			log.Println("user not found")
+			response.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
+			return
+		}
 		user.Name = requestBody.Name
-
-		// if user == nil {
-		// 	log.Println("user not found")
-		// 	response.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
-		// 	return
-		// }
 
 		err = controller.Interactor.UpdateUserByPrimaryKey(user)
 		if err != nil {
