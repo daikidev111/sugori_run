@@ -28,6 +28,9 @@ func Serve(addr string) {
 	http.HandleFunc("/ranking/list",
 		get(middleware.Authenticate(handler.HandleRankingGet())))
 
+	http.HandleFunc("/gacha/draw",
+		post(middleware.Authenticate(handler.HandleGachaPost())))
+
 	http.HandleFunc("/game/finish",
 		post(middleware.Authenticate(handler.HandleGameFinishPost())))
 

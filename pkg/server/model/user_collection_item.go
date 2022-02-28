@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"strings"
 
 	"22dojo-online/pkg/db"
 )
@@ -20,6 +21,23 @@ func SelectUserCollectionItemByUserID(userID string) ([]*UserCollectionItem, err
 	defer rows.Close()
 
 	return convertToUserCollectionItems(rows)
+}
+
+func InsertUserCollectionItemsByUserIDWithLock(tx *sql.Tx, userCollectionItems []*UserCollectionItem) error {
+	valueStrings := make([]string, 0, len(userCollectionItems))
+	valueArgs := make([]interface{}, 0, len(userCollectionItems)*2)
+	for _, userCollectionItem := range userCollectionItems {
+		valueStrings = append(valueStrings, "(?, ?)")
+		valueArgs = append(valueArgs, userCollectionItem.UserID, userCollectionItem.CollectionID)
+	}
+
+	var sb strings.Builder
+	sb.WriteString("INSERT INTO user_collection_item (user_id, collection_item_id) VALUES")
+	sb.WriteString(strings.Join(valueStrings, ","))
+	stmt := sb.String()
+
+	_, err := tx.Exec(stmt, valueArgs...)
+	return err
 }
 
 // convertToUserCollectionItemsでrowデータをUserCollectionItemデータへ変換する
