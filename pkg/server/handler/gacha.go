@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"time"
 
 	"22dojo-online/pkg/constant"
 	"22dojo-online/pkg/db"
@@ -120,6 +121,7 @@ func HandleGachaPost() http.HandlerFunc {
 
 			// =========== start of the loop ===================
 			for i := 0; i < requestBody.Times; i++ {
+				rand.Seed(time.Now().UnixNano())
 				//nolint: gosec // this is why
 				randInt := rand.Intn(sumOfRatio) // 乱数の取得
 
