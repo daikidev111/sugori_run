@@ -29,7 +29,7 @@ type gachaRequest struct {
 	Times int `json:"times"`
 }
 
-// HandleGachaPost
+//nolint: gocyclo // this is why
 func HandleGachaPost() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		var requestBody gachaRequest
@@ -81,9 +81,9 @@ func HandleGachaPost() http.HandlerFunc {
 			itemCollectionMap[collectionItem.ID] = collectionItems[i]
 		}
 
-		var SumOfRatio int
+		var sumOfRatio int
 		for _, gachaProb := range gachaProbabilities {
-			SumOfRatio += gachaProb.Ratio
+			sumOfRatio += gachaProb.Ratio
 		}
 
 		// トランザクション開始
@@ -120,7 +120,8 @@ func HandleGachaPost() http.HandlerFunc {
 
 			// =========== start of the loop ===================
 			for i := 0; i < requestBody.Times; i++ {
-				randInt := rand.Intn(SumOfRatio) // 乱数の取得
+				//nolint: gosec // this is why
+				randInt := rand.Intn(sumOfRatio) // 乱数の取得
 
 				var targetRatio int                            // Ratioから取得される値を足す際に必要
 				var targetCollectionID string                  // 乱数を越した際のcollection ID(ガチャの引きアイテム)
