@@ -38,8 +38,7 @@ func InsertUserCollectionItemsByUserIDWithLock(tx *sql.Tx, userCollectionItems [
 	valueArgs := make([]interface{}, 0, len(userCollectionItems)*3)
 	for _, userCollectionItem := range userCollectionItems {
 		valueStrings = append(valueStrings, "(?, ?)")
-		valueArgs = append(valueArgs, userCollectionItem.UserID)
-		valueArgs = append(valueArgs, userCollectionItem.CollectionID)
+		valueArgs = append(valueArgs, userCollectionItem.UserID, userCollectionItem.CollectionID)
 	}
 	stmt := fmt.Sprintf("INSERT INTO user_collection_item (user_id, collection_item_id) VALUES %s",
 		strings.Join(valueStrings, ","))
