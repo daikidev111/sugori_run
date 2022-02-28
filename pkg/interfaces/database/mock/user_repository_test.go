@@ -39,6 +39,18 @@ func TestSelectUserByPrimaryKey(t *testing.T) {
 			},
 			nil,
 		},
+		// { // second test case
+		// 	"Testing SelectUserByPrimaryKey from pkg/interfaces/database/user_repository.go",
+		// 	"78164dcf-6b7c-45e4-862a-2a0f6735a449",
+		// 	domain.User{
+		// 		ID:        "78164dcf-6b7c-45e4-862a-2a0f6735a449",
+		// 		AuthToken: "b187b9e0-08e6-42dd-a9b3-a900b137983c",
+		// 		Name:      "whatt",
+		// 		HighScore: 100,
+		// 		Coin:      -1000,
+		// 	},
+		// 	nil,
+		// },
 	}
 
 	/*   prepare   */
@@ -52,14 +64,14 @@ func TestSelectUserByPrimaryKey(t *testing.T) {
 		SQLHandler: DummySQLHandler(db),
 	}
 
-	query := "SELECT `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id`= ?"
+	query := "SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id`= ?"
 
 	for _, tt := range table {
 		t.Run(tt.testName, func(t *testing.T) {
-			b := tt.user
+			b := &tt.user
 			rows := sqlmock.NewRows([]string{
-				"auth_token", "name", "high_score", "coin",
-			}).AddRow(b.AuthToken, b.Name, b.HighScore, b.Coin)
+				"id", "auth_token", "name", "high_score", "coin",
+			}).AddRow(b.ID, b.AuthToken, b.Name, b.HighScore, b.Coin)
 			mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(tt.id).WillReturnRows(rows)
 			// ExpectQuery expects Query() or QueryRow() to be called with expectedSQL query.
 			// the *ExpectedQuery allows to mock database response.
