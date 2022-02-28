@@ -164,7 +164,7 @@ func HandleGachaPost() http.HandlerFunc {
 
 			// bulk insertの開始
 			if len(UserCollectionItemsArr) > 0 {
-				err = model.InsertUserCollectionItemsByUserIDWithLock(tx, UserCollectionItemsArr)
+				err := model.InsertUserCollectionItemsByUserIDWithLock(tx, UserCollectionItemsArr)
 				if err != nil {
 					log.Println("InsertUserCollectionItemsByUserIDWithLock: Failed to insert the new item(s) into the user's collection", err)
 					response.InternalServerError(writer, "Internal Server Error")
