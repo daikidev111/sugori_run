@@ -156,8 +156,7 @@ func HandleGachaPost() http.HandlerFunc {
 
 			// コイン消費（コインをマイナスにしてアップデート処理）
 			user.Coin -= constant.GachaCoinConsumption * times
-			err = model.UpdateCoinAndScoreByPrimaryKeyWithLock(tx, userID, user.HighScore, user.Coin)
-			if err != nil {
+			if err := model.UpdateCoinAndScoreByPrimaryKeyWithLock(tx, userID, user.HighScore, user.Coin); err != nil {
 				log.Println("UpdateCoinAndScoreByPrimaryKeyWithLock: Failed to update the user's coin", err)
 				response.InternalServerError(writer, "Internal Server Error")
 				return err
