@@ -17,3 +17,15 @@ type UserGetResponse struct {
 	HighScore int32  `json:"highScore"`
 	Coin      int32  `json:"coin"`
 }
+
+type UserCreateRequest struct {
+	Name string `json:"name"`
+}
+
+type UserCreateResponse struct {
+	Token string `json:"token"`
+}
+
+type UserUpdateRequest struct {
+	Name string `json:"name"`
+}
