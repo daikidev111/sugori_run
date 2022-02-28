@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"22dojo-online/pkg/infrastructure"
+	driver "22dojo-online/pkg/driver/mysql"
 	"22dojo-online/pkg/interfaces/controllers"
 	"22dojo-online/pkg/interfaces/middleware"
 	"22dojo-online/pkg/usecase"
@@ -16,8 +16,8 @@ func Serve(addr string) {
 
 	// m := middleware.NewAuth(db)
 
-	userController := controllers.NewUserController(infrastructure.NewSQLHandler())
-	UserInteractor := usecase.NewUserInteractor(infrastructure.NewSQLHandler())
+	userController := controllers.NewUserController(driver.NewSQLHandler())
+	UserInteractor := usecase.NewUserInteractor(driver.NewSQLHandler())
 	m := middleware.NewAuth(UserInteractor)
 
 	/* ===== URLマッピングを行う ===== */
