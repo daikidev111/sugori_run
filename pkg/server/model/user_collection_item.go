@@ -2,7 +2,6 @@ package model
 
 import (
 	"database/sql"
-	"fmt"
 	"strings"
 
 	"22dojo-online/pkg/db"
@@ -33,7 +32,8 @@ func InsertUserCollectionItemsByUserIDWithLock(tx *sql.Tx, userCollectionItems [
 	}
 
 	var sb strings.Builder
-	fmt.Fprintf(&sb, "INSERT INTO user_collection_item (user_id, collection_item_id) VALUES %s", strings.Join(valueStrings, ","))
+	sb.WriteString("INSERT INTO user_collection_item (user_id, collection_item_id) VALUES")
+	sb.WriteString(strings.Join(valueStrings, ","))
 	stmt := sb.String()
 
 	_, err := tx.Exec(stmt, valueArgs...)
