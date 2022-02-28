@@ -120,7 +120,7 @@ func HandleGachaPost() http.HandlerFunc {
 			}
 
 			// =========== start of the loop ===================
-			for i := 0; i < requestBody.Times; i++ {
+			for i := 0; i < int(times); i++ {
 				//nolint: gosec // this is why
 				randInt := rand.Intn(sumOfRatio) // 乱数の取得
 
