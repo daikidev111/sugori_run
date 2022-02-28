@@ -1,6 +1,5 @@
 package database
 
-//nolint: gofmt, goimports// this is why
 import (
 	"log"
 
