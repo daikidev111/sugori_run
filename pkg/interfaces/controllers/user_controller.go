@@ -7,10 +7,10 @@ import (
 	"net/http"
 
 	"22dojo-online/pkg/domain/entity"
+	"22dojo-online/pkg/errors"
 	"22dojo-online/pkg/interfaces/database"
 	"22dojo-online/pkg/interfaces/dcontext"
 	"22dojo-online/pkg/usecase"
-	"22dojo-online/pkg/utils"
 
 	"github.com/google/uuid"
 )
@@ -54,19 +54,19 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 		userID := dcontext.GetUserIDFromContext(ctx)
 		if userID == "" {
 			log.Println("userID is empty")
-			utils.InternalServerError(writer, "Internal Server Error")
+			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 
 		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Printf("[ERROR] GetUser() err = %s", err.Error())
-			utils.InternalServerError(writer, "Internal Server Error")
+			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 		if user == nil {
 			log.Println("user not found")
-			utils.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
+			errors.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
 			return
 		}
 
@@ -82,7 +82,7 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 		data, err := json.Marshal(body)
 		if err != nil {
 			log.Println(err)
-			utils.InternalServerError(writer, "marshal error")
+			errors.InternalServerError(writer, "marshal error")
 			return
 		}
 		if _, err := writer.Write(data); err != nil {
@@ -97,7 +97,7 @@ func (controller *UserController) InsertUser() http.HandlerFunc {
 		var requestBody UserCreateRequest
 		if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
 			log.Println(err)
-			utils.BadRequest(writer, "Bad Request")
+			errors.BadRequest(writer, "Bad Request")
 			return
 		}
 
@@ -105,7 +105,7 @@ func (controller *UserController) InsertUser() http.HandlerFunc {
 		userID, err := uuid.NewRandom()
 		if err != nil {
 			log.Println(err)
-			utils.InternalServerError(writer, "Internal Server Error")
+			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 
@@ -113,7 +113,7 @@ func (controller *UserController) InsertUser() http.HandlerFunc {
 		authToken, err := uuid.NewRandom()
 		if err != nil {
 			log.Println(err)
-			utils.InternalServerError(writer, "Internal Server Error")
+			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 		// データベースにユーザデータを登録する
@@ -126,7 +126,7 @@ func (controller *UserController) InsertUser() http.HandlerFunc {
 		}
 		if err := controller.Interactor.InsertUser(user); err != nil {
 			log.Printf("[ERROR] InsertUser() err = %s", err.Error())
-			utils.InternalServerError(writer, "Internal Server Error")
+			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 
@@ -138,7 +138,7 @@ func (controller *UserController) InsertUser() http.HandlerFunc {
 		data, err := json.Marshal(body)
 		if err != nil {
 			log.Println(err)
-			utils.InternalServerError(writer, "marshal error")
+			errors.InternalServerError(writer, "marshal error")
 			return
 		}
 		if _, err := writer.Write(data); err != nil {
@@ -153,7 +153,7 @@ func (controller *UserController) UpdateUser() http.HandlerFunc {
 		var requestBody UserUpdateRequest
 		if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
 			log.Println(err)
-			utils.BadRequest(writer, "Bad Request")
+			errors.BadRequest(writer, "Bad Request")
 			return
 		}
 
@@ -162,26 +162,26 @@ func (controller *UserController) UpdateUser() http.HandlerFunc {
 		userID := dcontext.GetUserIDFromContext(ctx)
 		if userID == "" {
 			log.Println("userID is empty")
-			utils.InternalServerError(writer, "Internal Server Error")
+			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 
 		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Printf("[ERROR] UpdateUser() err = %s", err.Error())
-			utils.InternalServerError(writer, "Internal Server Error")
+			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 		if user == nil {
 			log.Println("user not found")
-			utils.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
+			errors.BadRequest(writer, fmt.Sprintf("user not found. userID=%s", userID))
 			return
 		}
 		user.Name = requestBody.Name
 
 		err = controller.Interactor.UpdateUserByPrimaryKey(user)
 		if err != nil {
-			utils.InternalServerError(writer, "Internal Server Error")
+			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 	}

@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"22dojo-online/pkg/constant"
-	"22dojo-online/pkg/utils"
+	"22dojo-online/pkg/errors"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -23,7 +23,7 @@ func GetSetting() http.HandlerFunc {
 		data, err := json.Marshal(response)
 		if err != nil {
 			log.Println(err)
-			utils.InternalServerError(writer, "marshal error")
+			errors.InternalServerError(writer, "marshal error")
 			return
 		}
 		if _, err := writer.Write(data); err != nil {
