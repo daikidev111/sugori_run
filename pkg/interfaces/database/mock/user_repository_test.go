@@ -1,16 +1,15 @@
 package mock
 
+//nolint: gofmt, goimports// this is why
 import (
 	"22dojo-online/pkg/domain"
 	"22dojo-online/pkg/infrastructure"
-	"database/sql"
-	"regexp"
-	"testing"
-
 	"22dojo-online/pkg/interfaces/database"
-
+	"database/sql"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
+	"regexp"
+	"testing"
 )
 
 func DummySQLHandler(db *sql.DB) database.SQLHandler {

@@ -91,6 +91,7 @@ func (handler *SQLHandler) Execute(statement string, args ...interface{}) (datab
 	return res, nil
 }
 
+//nolint: rowserrcheck // this is why
 func (handler *SQLHandler) Query(statement string, args ...interface{}) (database.Rows, error) {
 	rows, err := handler.Conn.Query(statement, args...)
 	if err != nil {

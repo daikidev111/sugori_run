@@ -1,8 +1,10 @@
 package database
 
+//nolint: gofmt, goimports// this is why
 import (
-	"22dojo-online/pkg/domain"
 	"log"
+
+	"22dojo-online/pkg/domain"
 )
 
 type UserRepository struct {
@@ -18,7 +20,7 @@ func (repo *UserRepository) SelectUserByPrimaryKey(userID string) (user *domain.
 		return
 	}
 
-	if err = row.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin); err != nil {
+	if err := row.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin); err != nil {
 		return nil, err
 	}
 
@@ -34,7 +36,7 @@ func (repo *UserRepository) SelectUserByAuthToken(authToken string) (user *domai
 		return
 	}
 
-	if err = row.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin); err != nil {
+	if err := row.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin); err != nil {
 		return nil, err
 	}
 	return user, nil
