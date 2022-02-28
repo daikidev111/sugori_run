@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"time"
 
 	"22dojo-online/pkg/constant"
 	"22dojo-online/pkg/db"
@@ -77,7 +76,7 @@ func HandleGachaPost() http.HandlerFunc {
 		gachaCollectionList := make([]*gachaResponse, 0, requestBody.Times)               // Response用のスライス
 		itemCollectionMap := make(map[string]*model.CollectionItem, len(collectionItems)) // itemCollectionのマップ
 
-		// IDのキーと格アイテムの情報が入っている静的マップの生成
+		// IDのキーと各アイテムの情報が入っている静的マップの生成
 		for i, collectionItem := range collectionItems {
 			itemCollectionMap[collectionItem.ID] = collectionItems[i]
 		}
@@ -92,7 +91,8 @@ func HandleGachaPost() http.HandlerFunc {
 			}
 
 			times := int32(requestBody.Times)
-			if user.Coin < constant.GachaCoinConsumption*times {
+			totalCoin := constant.GachaCoinConsumption * times
+			if user.Coin < totalCoin {
 				log.Println("Not enough coins")
 				response.BadRequest(writer, "Invalid gacha draw")
 				return err
@@ -106,7 +106,7 @@ func HandleGachaPost() http.HandlerFunc {
 				return err
 			}
 
-			UserCollectionItemsArr := make([]*model.UserCollectionItem, 0, times)                // Gachaで取得された新アイテムの格納
+			userCollectionItemsArr := make([]*model.UserCollectionItem, 0, times)                // Gachaで取得された新アイテムの格納
 			userCollectionItemsMap := make(map[string]bool, len(userCollectionItems)+int(times)) // user_collection_itemsのマップ
 
 			// すでに所持しているかをIDを突き合わせて判定するためのマップ(動的）
@@ -121,7 +121,6 @@ func HandleGachaPost() http.HandlerFunc {
 
 			// =========== start of the loop ===================
 			for i := 0; i < requestBody.Times; i++ {
-				rand.Seed(time.Now().UnixNano())
 				//nolint: gosec // this is why
 				randInt := rand.Intn(sumOfRatio) // 乱数の取得
 
@@ -145,7 +144,7 @@ func HandleGachaPost() http.HandlerFunc {
 
 				// 新アイテムはUserCollcetionItemsArrに格納(bulk insert時に必要となる)
 				if !userCollectionItemsMap[targetCollectionID] {
-					UserCollectionItemsArr = append(UserCollectionItemsArr, &model.UserCollectionItem{
+					userCollectionItemsArr = append(userCollectionItemsArr, &model.UserCollectionItem{
 						UserID:       userID,
 						CollectionID: targetCollectionID,
 					})
@@ -155,7 +154,7 @@ func HandleGachaPost() http.HandlerFunc {
 			// ========== end of the loop ==============
 
 			// コイン消費（コインをマイナスにしてアップデート処理）
-			user.Coin -= constant.GachaCoinConsumption * times
+			user.Coin -= totalCoin
 			if err := model.UpdateCoinAndScoreByPrimaryKeyWithLock(tx, userID, user.HighScore, user.Coin); err != nil {
 				log.Println("UpdateCoinAndScoreByPrimaryKeyWithLock: Failed to update the user's coin", err)
 				response.InternalServerError(writer, "Internal Server Error")
@@ -163,8 +162,8 @@ func HandleGachaPost() http.HandlerFunc {
 			}
 
 			// bulk insertの開始
-			if len(UserCollectionItemsArr) > 0 {
-				err := model.InsertUserCollectionItemsByUserIDWithLock(tx, UserCollectionItemsArr)
+			if len(userCollectionItemsArr) > 0 {
+				err := model.InsertUserCollectionItemsByUserIDWithLock(tx, userCollectionItemsArr)
 				if err != nil {
 					log.Println("InsertUserCollectionItemsByUserIDWithLock: Failed to insert the new item(s) into the user's collection", err)
 					response.InternalServerError(writer, "Internal Server Error")
