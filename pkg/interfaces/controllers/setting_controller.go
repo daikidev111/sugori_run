@@ -1,18 +1,15 @@
 package controllers
 
 import (
+	"22dojo-online/pkg/interfaces/handler"
 	"net/http"
-
-	"22dojo-online/pkg/constant"
-	"22dojo-online/pkg/http/response"
 )
 
 // GetSetting ゲーム設定情報取得処理
 func GetSetting() http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		response.Success(writer, &settingGetResponse{
-			GachaCoinConsumption: constant.GachaCoinConsumption,
-		})
+		settingHandler := handler.NewSettingHandler()
+		settingHandler.GetSettingHandler(writer)
 	}
 }
 

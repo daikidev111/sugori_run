@@ -7,8 +7,8 @@ import (
 
 	"22dojo-online/pkg/dcontext"
 	"22dojo-online/pkg/domain"
-	"22dojo-online/pkg/http/response"
 	"22dojo-online/pkg/usecase"
+	"22dojo-online/pkg/utils"
 )
 
 type Auth struct {
@@ -40,13 +40,13 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 		user, err = auth.userInteractor.SelectUserByAuthToken(token)
 		if err != nil {
 			log.Println(err)
-			response.InternalServerError(writer, "Internal Server Error")
+			utils.InternalServerError(writer, "Internal Server Error")
 			return
 		}
 
 		if err != nil {
 			log.Println(err)
-			response.InternalServerError(writer, "Invalid token")
+			utils.InternalServerError(writer, "Invalid token")
 			return
 		}
 		// if user == nil {
