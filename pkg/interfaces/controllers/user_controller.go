@@ -39,7 +39,7 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 			utils.InternalServerError(writer, "Internal Server Error")
 			return
 		}
-		var user *domain.User
+
 		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
 
 		if err != nil {
@@ -123,9 +123,7 @@ func (controller *UserController) UpdateUser() http.HandlerFunc {
 			return
 		}
 
-		var user *domain.User
-		var err error
-		user, err = controller.Interactor.SelectUserByPrimaryKey(userID)
+		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Println(err)
 			utils.InternalServerError(writer, "Internal Server Error")
