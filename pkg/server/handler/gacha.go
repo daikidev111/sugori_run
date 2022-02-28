@@ -40,8 +40,8 @@ func HandleGachaPost() http.HandlerFunc {
 			return
 		}
 
-		if requestBody.Times < 1 {
-			log.Println("Times cannot be less than 1")
+		if requestBody.Times < 1 || requestBody.Times > constant.GachaUpperLimit {
+			log.Println("Times cannot be less than 1 or greater than 10")
 			response.BadRequest(writer, "Bad Request")
 			return
 		}
