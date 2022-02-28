@@ -35,7 +35,7 @@ func SelectUserCollectionItemByUserIDWithLock(tx *sql.Tx, userID string) ([]*Use
 
 func InsertUserCollectionItemsByUserIDWithLock(tx *sql.Tx, userCollectionItems []*UserCollectionItem) error {
 	valueStrings := make([]string, 0, len(userCollectionItems))
-	valueArgs := make([]interface{}, 0, len(userCollectionItems)*3)
+	valueArgs := make([]interface{}, 0, len(userCollectionItems)*2)
 	for _, userCollectionItem := range userCollectionItems {
 		valueStrings = append(valueStrings, "(?, ?)")
 		valueArgs = append(valueArgs, userCollectionItem.UserID, userCollectionItem.CollectionID)
