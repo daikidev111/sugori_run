@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"22dojo-online/pkg/domain"
+	"22dojo-online/pkg/domain/entity"
 	"22dojo-online/pkg/interfaces/database"
 	"fmt"
 )
@@ -18,7 +18,7 @@ func NewUserInteractor(sqlHandler database.SQLHandler) *UserInteractor {
 	}
 }
 
-func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (*domain.User, error) {
+func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
 	user, err := interactor.UserRepository.SelectUserByPrimaryKey(userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query a user by primary key. err = %w", err)
@@ -26,7 +26,7 @@ func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (*domain
 	return user, nil
 }
 
-func (interactor *UserInteractor) SelectUserByAuthToken(authToken string) (*domain.User, error) {
+func (interactor *UserInteractor) SelectUserByAuthToken(authToken string) (*entity.User, error) {
 	user, err := interactor.UserRepository.SelectUserByAuthToken(authToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query a user by auth token. err = %w", err)
@@ -34,14 +34,14 @@ func (interactor *UserInteractor) SelectUserByAuthToken(authToken string) (*doma
 	return user, nil
 }
 
-func (interactor *UserInteractor) InsertUser(user *domain.User) error {
+func (interactor *UserInteractor) InsertUser(user *entity.User) error {
 	if err := interactor.UserRepository.InsertUser(user); err != nil {
 		return fmt.Errorf("failed to insert user. err = %w", err)
 	}
 	return nil
 }
 
-func (interactor *UserInteractor) UpdateUserByPrimaryKey(user *domain.User) error {
+func (interactor *UserInteractor) UpdateUserByPrimaryKey(user *entity.User) error {
 	if err := interactor.UserRepository.UpdateUserByPrimaryKey(user); err != nil {
 		return fmt.Errorf("failed to update user. err = %w", err)
 	}

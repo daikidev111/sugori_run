@@ -1,10 +1,10 @@
 package usecase
 
-import "22dojo-online/pkg/domain"
+import "22dojo-online/pkg/domain/entity"
 
 type UserRepository interface {
-	SelectUserByPrimaryKey(string) (*domain.User, error)
-	SelectUserByAuthToken(string) (*domain.User, error)
-	InsertUser(user *domain.User) error
-	UpdateUserByPrimaryKey(user *domain.User) error
+	SelectUserByPrimaryKey(string) (*entity.User, error)
+	SelectUserByAuthToken(string) (*entity.User, error)
+	InsertUser(user *entity.User) error
+	UpdateUserByPrimaryKey(user *entity.User) error
 }

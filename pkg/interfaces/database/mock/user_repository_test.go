@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"testing"
 
-	"22dojo-online/pkg/domain"
+	"22dojo-online/pkg/domain/entity"
 	"22dojo-online/pkg/infrastructure"
 	"22dojo-online/pkg/interfaces/database"
 
@@ -24,13 +24,13 @@ func TestSelectUserByPrimaryKey(t *testing.T) {
 	table := []struct {
 		testName string
 		id       string
-		user     domain.User
+		user     entity.User
 		err      error
 	}{
 		{
 			"Testing SelectUserByPrimaryKey from pkg/interfaces/database/user_repository.go",
 			"78164dcf-6b7c-45e4-862a-2a0f6735a449",
-			domain.User{
+			entity.User{
 				ID:        "78164dcf-6b7c-45e4-862a-2a0f6735a449",
 				AuthToken: "b187b9e0-08e6-42dd-a9b3-a900b137983c",
 				Name:      "whatt",

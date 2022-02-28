@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"22dojo-online/pkg/dcontext"
-	"22dojo-online/pkg/domain"
 	"22dojo-online/pkg/interfaces/database"
 	"22dojo-online/pkg/usecase"
 	"22dojo-online/pkg/utils"
@@ -117,7 +116,7 @@ func (controller *UserController) InsertUser() http.HandlerFunc {
 			return
 		}
 		// データベースにユーザデータを登録する
-		user := &domain.User{
+		user := &entity.User{
 			ID:        userID.String(),
 			AuthToken: authToken.String(),
 			Name:      requestBody.Name,

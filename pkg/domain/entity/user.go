@@ -1,4 +1,4 @@
-package domain
+package entity
 
 // domain では技術的ロジックは何も入れない
 type User struct {

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"22dojo-online/pkg/dcontext"
-	"22dojo-online/pkg/domain"
+	"22dojo-online/pkg/domain/entity"
 	"22dojo-online/pkg/usecase"
 	"22dojo-online/pkg/utils"
 )
@@ -35,7 +35,7 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		var user *domain.User
+		var user *entity.User
 		var err error
 		user, err = auth.userInteractor.SelectUserByAuthToken(token)
 		if err != nil {
