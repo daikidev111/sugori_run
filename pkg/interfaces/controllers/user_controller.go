@@ -59,9 +59,8 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 		}
 
 		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
-
 		if err != nil {
-			log.Println(err)
+			log.Printf("[ERROR] GetUser() err = %s", err.Error())
 			utils.InternalServerError(writer, "Internal Server Error")
 			return
 		}
@@ -169,7 +168,7 @@ func (controller *UserController) UpdateUser() http.HandlerFunc {
 
 		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
 		if err != nil {
-			log.Println(err)
+			log.Printf("[ERROR] UpdateUser() err = %s", err.Error())
 			utils.InternalServerError(writer, "Internal Server Error")
 			return
 		}
