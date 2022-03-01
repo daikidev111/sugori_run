@@ -32,6 +32,7 @@ func (repo *UserRepository) SelectUserByPrimaryKey(userID string) (*entity.User,
 // SelectUserByAuthToken auth_tokenを条件にレコードを取得する
 func (repo *UserRepository) SelectUserByAuthToken(authToken string) (*entity.User, error) {
 	var user entity.User
+	log.Println(authToken)
 	rows, err := repo.Query("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `auth_token` = ?", authToken)
 	if err != nil {
 		return nil, err

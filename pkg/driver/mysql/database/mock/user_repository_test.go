@@ -19,6 +19,7 @@ func DummySQLHandler(db *sql.DB) database.SQLHandler {
 	return SQLHandler
 }
 
+// go test -v pkg/driver/mysql/database/mock/user_repository_test.go
 func TestSelectUserByPrimaryKey(t *testing.T) {
 	// table for test
 	table := []struct {
@@ -28,7 +29,7 @@ func TestSelectUserByPrimaryKey(t *testing.T) {
 		err      error
 	}{
 		{
-			"Testing SelectUserByPrimaryKey from pkg/interfaces/database/user_repository.go",
+			"FIRST TEST CASE: SelectUserByPrimaryKey from pkg/interfaces/database/user_repository.go",
 			"78164dcf-6b7c-45e4-862a-2a0f6735a449",
 			entity.User{
 				ID:        "78164dcf-6b7c-45e4-862a-2a0f6735a449",
@@ -39,18 +40,18 @@ func TestSelectUserByPrimaryKey(t *testing.T) {
 			},
 			nil,
 		},
-		// { // second test case
-		// 	"Testing SelectUserByPrimaryKey from pkg/interfaces/database/user_repository.go",
-		// 	"78164dcf-6b7c-45e4-862a-2a0f6735a449",
-		// 	domain.User{
-		// 		ID:        "78164dcf-6b7c-45e4-862a-2a0f6735a449",
-		// 		AuthToken: "b187b9e0-08e6-42dd-a9b3-a900b137983c",
-		// 		Name:      "whatt",
-		// 		HighScore: 100,
-		// 		Coin:      -1000,
-		// 	},
-		// 	nil,
-		// },
+		{ // second test case
+			"SECOND TEST CASE: SelectUserByPrimaryKey from pkg/interfaces/database/user_repository.go",
+			"78164dcf-6b7c-45e4-862a-2a0f6735a449",
+			entity.User{
+				ID:        "78164dcf-6b7c-45e4-862a-2a0f6735a449",
+				AuthToken: "b187b9e0-08e6-42dd-a9b3-a900b137983c",
+				Name:      "whatt",
+				HighScore: 100,
+				Coin:      -1000,
+			},
+			nil,
+		},
 	}
 
 	/*   prepare   */
