@@ -7,10 +7,6 @@ import (
 	"22dojo-online/pkg/domain/service"
 )
 
-// type UserInteractor struct {
-// 	UserRepository repository.UserRepository
-// }
-
 type UserInteractor struct {
 	UserService service.UserServiceInterface
 }
@@ -20,16 +16,6 @@ func NewUserInteractor(userService service.UserServiceInterface) *UserInteractor
 		UserService: userService,
 	}
 }
-
-// func NewUserInteractor(sqlHandler database.SQLHandler) *UserInteractor {
-// 	return &UserInteractor{
-// 		UserService: &service.UserService{
-// 			UserRepository: &database.UserRepository{
-// 				SQLHandler: sqlHandler,
-// 			},
-// 		},
-// 	}
-// }
 
 //TODO: change the func name to get user
 func (ui *UserInteractor) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
