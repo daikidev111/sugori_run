@@ -18,7 +18,7 @@ type SQLHandlerImpl struct {
 	Conn *sql.DB // Conn 各repositoryで利用するDB接続(Connection)情報
 }
 
-func NewSQLHandler() *SQLHandlerImpl {
+func NewSQLHandler() database.SQLHandler {
 	/* ===== データベースへ接続する. ===== */
 	// ユーザ
 	user := os.Getenv("MYSQL_USER")

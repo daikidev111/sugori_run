@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"22dojo-online/pkg/adapters/dcontext"
-	"22dojo-online/pkg/domain/entity"
 	"22dojo-online/pkg/errors"
 	"22dojo-online/pkg/usecase"
 )
@@ -35,9 +34,7 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		var user *entity.User
-		var err error
-		user, err = auth.userInteractor.SelectUserByAuthToken(token)
+		user, err := auth.userInteractor.SelectUserByAuthToken(token)
 		if err != nil {
 			log.Println(err)
 			errors.InternalServerError(writer, "Internal Server Error")

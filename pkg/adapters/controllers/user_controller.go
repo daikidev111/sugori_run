@@ -8,8 +8,6 @@ import (
 
 	"22dojo-online/pkg/adapters/dcontext"
 	"22dojo-online/pkg/domain/entity"
-	"22dojo-online/pkg/domain/service"
-	"22dojo-online/pkg/driver/mysql/database"
 	"22dojo-online/pkg/errors"
 	"22dojo-online/pkg/usecase"
 
@@ -17,7 +15,7 @@ import (
 )
 
 type UserController struct {
-	Interactor usecase.UserInteractor
+	Interactor *usecase.UserInteractor
 }
 
 type UserCreateRequest struct {
@@ -39,15 +37,9 @@ type UserCreateResponse struct {
 	Token string `json:"token"`
 }
 
-func NewUserController(sqlHandler database.SQLHandler) *UserController {
+func NewUserController(ui *usecase.UserInteractor) *UserController {
 	return &UserController{
-		Interactor: usecase.UserInteractor{
-			UserService: &service.UserService{
-				UserRepository: &database.UserRepository{
-					SQLHandler: sqlHandler,
-				},
-			},
-		},
+		Interactor: ui,
 	}
 }
 
@@ -60,6 +52,7 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
+		log.Println(userID)
 
 		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
 		if err != nil {
@@ -104,7 +97,7 @@ func (controller *UserController) InsertUser() http.HandlerFunc {
 			return
 		}
 
-		// TODO: request時にvalidator を使って
+		// TODO: request時にvalidator を使ってvalidation
 		// UUIDでユーザIDを生成する
 		userID, err := uuid.NewRandom()
 		if err != nil {

@@ -10,35 +10,41 @@ type UserRepository struct {
 	SQLHandler
 }
 
-// SelectUserByPrimaryKey auth_tokenを条件にレコードを取得する
-func (repo *UserRepository) SelectUserByPrimaryKey(userID string) (user *entity.User, err error) {
-	user = &entity.User{}
-	row := repo.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id`= ?", userID)
-	if err != nil {
-		log.Println(err, "Query Row error")
-		return
+func NewUserRepository(sqlHandler SQLHandler) *UserRepository {
+	return &UserRepository{
+		SQLHandler: sqlHandler,
 	}
+}
+
+// SelectUserByPrimaryKey auth_tokenを条件にレコードを取得する
+func (repo *UserRepository) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
+	var user entity.User
+	row := repo.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id`= ?", userID)
 
 	if err := row.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin); err != nil {
 		return nil, err
 	}
+	log.Println(user)
 
-	return user, nil
+	return &user, nil
 }
 
 // SelectUserByAuthToken auth_tokenを条件にレコードを取得する
-func (repo *UserRepository) SelectUserByAuthToken(authToken string) (user *entity.User, err error) {
-	user = &entity.User{}
-	row := repo.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `auth_token`=?", authToken)
+func (repo *UserRepository) SelectUserByAuthToken(authToken string) (*entity.User, error) {
+	var user entity.User
+	rows, err := repo.Query("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `auth_token` = ?", authToken)
 	if err != nil {
-		log.Println(err, "Query Row error")
-		return
-	}
-
-	if err := row.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin); err != nil {
 		return nil, err
 	}
-	return user, nil
+	for rows.Next() {
+		err := rows.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	log.Println(user.ID)
+	return &user, nil
 }
 
 func (repo *UserRepository) InsertUser(user *entity.User) error {
