@@ -1,8 +1,6 @@
 package database
 
 import (
-	"log"
-
 	"22dojo-online/pkg/domain/entity"
 )
 
@@ -20,11 +18,9 @@ func NewUserRepository(sqlHandler SQLHandler) *UserRepository {
 func (repo *UserRepository) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
 	var user entity.User
 	row := repo.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `id`= ?", userID)
-
 	if err := row.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin); err != nil {
 		return nil, err
 	}
-	log.Println(user)
 
 	return &user, nil
 }
@@ -32,19 +28,11 @@ func (repo *UserRepository) SelectUserByPrimaryKey(userID string) (*entity.User,
 // SelectUserByAuthToken auth_tokenを条件にレコードを取得する
 func (repo *UserRepository) SelectUserByAuthToken(authToken string) (*entity.User, error) {
 	var user entity.User
-	log.Println(authToken)
-	rows, err := repo.Query("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `auth_token` = ?", authToken)
-	if err != nil {
+	row := repo.QueryRow("SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `auth_token`= ?", authToken)
+	if err := row.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin); err != nil {
 		return nil, err
 	}
-	for rows.Next() {
-		err := rows.Scan(&user.ID, &user.AuthToken, &user.Name, &user.HighScore, &user.Coin)
-		if err != nil {
-			return nil, err
-		}
-	}
 
-	log.Println(user.ID)
 	return &user, nil
 }
 
