@@ -1,9 +1,10 @@
 package usecase
 
 import (
+	"fmt"
+
 	"22dojo-online/pkg/domain/entity"
 	"22dojo-online/pkg/interfaces/database"
-	"fmt"
 )
 
 type UserInteractor struct {

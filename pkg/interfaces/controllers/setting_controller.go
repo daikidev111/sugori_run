@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"22dojo-online/pkg/constant"
-	"22dojo-online/pkg/errors"
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"22dojo-online/pkg/constant"
+	"22dojo-online/pkg/errors"
 )
 
 // GetSetting ゲーム設定情報取得処理
