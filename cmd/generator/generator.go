@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"os"
 	"text/template"
@@ -11,12 +13,18 @@ type Language struct {
 	URL  string
 }
 
+//  go run generator.go -model="User"
 func main() {
 
 	// load template file
 	// template, err := template.New("index.html.tmpl").ParseFiles("index.html.tmpl")
 	// ParseFiles -> which template file
 	// New
+
+	// go run generator.go model="User"
+	f := flag.String("model", "None", "This is to generate files based on the model name")
+	flag.Parse()
+	fmt.Println(*f)
 
 	data := Language{
 		Name: `Go`,
