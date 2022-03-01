@@ -1,8 +1,9 @@
-package database // move to driver
+package database
 
 import (
-	"22dojo-online/pkg/domain/entity"
 	"log"
+
+	"22dojo-online/pkg/domain/entity"
 )
 
 type UserRepository struct {

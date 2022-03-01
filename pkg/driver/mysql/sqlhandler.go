@@ -1,13 +1,14 @@
 package driver
 
 import (
-	"22dojo-online/pkg/driver/mysql/database"
 	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+
+	"22dojo-online/pkg/driver/mysql/database"
 )
 
 // Driver名

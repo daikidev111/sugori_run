@@ -20,7 +20,7 @@ func NewUserInteractor(sqlHandler database.SQLHandler) *UserInteractor {
 	}
 }
 
-// change the func name to get user
+//TODO: change the func name to get user
 func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
 	user, err := interactor.UserRepository.SelectUserByPrimaryKey(userID)
 	if err != nil {
