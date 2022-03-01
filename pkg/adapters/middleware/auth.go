@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"22dojo-online/pkg/adapters/dcontext"
 	"22dojo-online/pkg/domain/entity"
 	"22dojo-online/pkg/errors"
-	"22dojo-online/pkg/interfaces/dcontext"
 	"22dojo-online/pkg/usecase"
 )
 
