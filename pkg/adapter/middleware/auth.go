@@ -46,11 +46,11 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			errors.InternalServerError(writer, "Invalid token")
 			return
 		}
-		// if user == nil {
-		// 	log.Printf("user not found. token=%s", token)
-		// 	response.BadRequest(writer, "Invalid token")
-		// 	return
-		// }
+		if user == nil {
+			log.Printf("user not found. token=%s", token)
+			errors.BadRequest(writer, "Invalid token")
+			return
+		}
 
 		// ユーザIDをContextへ保存して以降の処理に利用する
 		ctx = dcontext.SetUserID(ctx, user.ID)

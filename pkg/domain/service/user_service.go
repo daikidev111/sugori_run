@@ -5,7 +5,6 @@ Service ではドメインの仕様をチェックする
 */
 import (
 	"fmt"
-	"log"
 
 	"gopkg.in/go-playground/validator.v9"
 
@@ -33,7 +32,6 @@ func NewUserService(userRepository *database.UserRepository) *UserService {
 
 func (us *UserService) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
 	user, err := us.UserRepository.SelectUserByPrimaryKey(userID)
-	log.Println(user)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query a user by primary key. err = %w", err)
 	}
