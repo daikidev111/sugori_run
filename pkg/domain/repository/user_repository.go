@@ -1,4 +1,4 @@
-package service
+package repository
 
 import "22dojo-online/pkg/domain/entity"
 

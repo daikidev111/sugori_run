@@ -4,7 +4,7 @@ package entity
 type User struct {
 	ID        string
 	AuthToken string
-	Name      string
+	Name      string `validate:"required"`
 	HighScore int32
 	Coin      int32
 }

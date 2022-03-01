@@ -8,21 +8,27 @@ import (
 	"22dojo-online/pkg/driver/mysql/database"
 )
 
+// type UserInteractor struct {
+// 	UserRepository repository.UserRepository
+// }
+
 type UserInteractor struct {
-	UserRepository service.UserRepository
+	UserService service.UserServiceInterface
 }
 
 func NewUserInteractor(sqlHandler database.SQLHandler) *UserInteractor {
 	return &UserInteractor{
-		UserRepository: &database.UserRepository{
-			SQLHandler: sqlHandler,
+		UserService: &service.UserService{
+			UserRepository: &database.UserRepository{
+				SQLHandler: sqlHandler,
+			},
 		},
 	}
 }
 
 //TODO: change the func name to get user
 func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
-	user, err := interactor.UserRepository.SelectUserByPrimaryKey(userID)
+	user, err := interactor.SelectUserByPrimaryKey(userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query a user by primary key. err = %w", err)
 	}
@@ -30,7 +36,7 @@ func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (*entity
 }
 
 func (interactor *UserInteractor) SelectUserByAuthToken(authToken string) (*entity.User, error) {
-	user, err := interactor.UserRepository.SelectUserByAuthToken(authToken)
+	user, err := interactor.SelectUserByAuthToken(authToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query a user by auth token. err = %w", err)
 	}
@@ -38,14 +44,14 @@ func (interactor *UserInteractor) SelectUserByAuthToken(authToken string) (*enti
 }
 
 func (interactor *UserInteractor) InsertUser(user *entity.User) error {
-	if err := interactor.UserRepository.InsertUser(user); err != nil {
+	if err := interactor.InsertUser(user); err != nil {
 		return fmt.Errorf("failed to insert user. err = %w", err)
 	}
 	return nil
 }
 
 func (interactor *UserInteractor) UpdateUserByPrimaryKey(user *entity.User) error {
-	if err := interactor.UserRepository.UpdateUserByPrimaryKey(user); err != nil {
+	if err := interactor.UpdateUserByPrimaryKey(user); err != nil {
 		return fmt.Errorf("failed to update user. err = %w", err)
 	}
 	return nil

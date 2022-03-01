@@ -8,6 +8,7 @@ import (
 
 	"22dojo-online/pkg/adapters/dcontext"
 	"22dojo-online/pkg/domain/entity"
+	"22dojo-online/pkg/domain/service"
 	"22dojo-online/pkg/driver/mysql/database"
 	"22dojo-online/pkg/errors"
 	"22dojo-online/pkg/usecase"
@@ -41,8 +42,10 @@ type UserCreateResponse struct {
 func NewUserController(sqlHandler database.SQLHandler) *UserController {
 	return &UserController{
 		Interactor: usecase.UserInteractor{
-			UserRepository: &database.UserRepository{
-				SQLHandler: sqlHandler,
+			UserService: &service.UserService{
+				UserRepository: &database.UserRepository{
+					SQLHandler: sqlHandler,
+				},
 			},
 		},
 	}
@@ -101,6 +104,7 @@ func (controller *UserController) InsertUser() http.HandlerFunc {
 			return
 		}
 
+		// TODO: request時にvalidator を使って
 		// UUIDでユーザIDを生成する
 		userID, err := uuid.NewRandom()
 		if err != nil {
