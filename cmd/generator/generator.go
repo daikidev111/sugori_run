@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"html/template"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"unicode"
 )
@@ -41,15 +41,18 @@ type Controller struct {
 
 var FileExtension = ".go"
 
+var EntityPath = "./../../pkg/domain/entity/"
+var DomainRepositoryPath = "./../../pkg/domain/repository/"
+var DomainServicePath = "./../../pkg/domain/service/"
+var DatabaseRepositoryPath = "./../../pkg/driver/mysql/database/"
+var InteractorPath = "./../../pkg/usecase/"
+var ControllerPath = "./../../pkg/adapter/controllers/"
+
 //  go run generator.go -model="User"
 func main() {
-	// go run generator.go model="User"
 	f := flag.String("model", "None", "This is to generate files based on the model name")
 	flag.Parse()
-	// fmt.Println(*f)
 	words := strings.Fields(*f)
-
-	// fmt.Println(words)
 
 	var model string
 	var modelFCharLowerCase string
@@ -64,15 +67,19 @@ func main() {
 	} else {
 		log.Println("Does not accept empty word")
 	}
-	// createEntityFile(model)
-	// createDomainRepositoryFile(model)
+	createEntityFile(model)
+	createDomainRepositoryFile(model)
 	createServiceFile(model, modelFCharLowerCase)
-	// createDatabaseRepositoryFile(model)
-	// createInteractorFile(model, modelFCharLowerCase)
-	// createControllerFile(model, modelFCharLowerCase)
+	createDatabaseRepositoryFile(model)
+	createInteractorFile(model, modelFCharLowerCase)
+	createControllerFile(model, modelFCharLowerCase)
 }
 
 func createEntityFile(model string) {
+	if _, err := os.Stat(EntityPath); os.IsNotExist(err) {
+		log.Println("such file or directory does not exist. err = ", err)
+		return
+	}
 	data := Entity{
 		Package: "entity",
 		Model:   model,
@@ -86,7 +93,7 @@ func createEntityFile(model string) {
 	fileName := strings.ToLower(model) + FileExtension
 
 	// ファイルの生成
-	fp, err := os.Create(fileName)
+	fp, err := os.Create(filepath.Join(EntityPath, fileName))
 	if err != nil {
 		log.Println("error creating file", err)
 	}
@@ -99,8 +106,12 @@ func createEntityFile(model string) {
 }
 
 func createDomainRepositoryFile(model string) {
+	if _, err := os.Stat(DomainRepositoryPath); os.IsNotExist(err) {
+		log.Println("such file or directory does not exist. err = ", err)
+		return
+	}
 	data := DomainRepository{
-		Package: "entity",
+		Package: "repository",
 		Model:   model,
 	}
 	template, err := template.New("domain_repo.tmpl").ParseGlob("domain_repo.tmpl")
@@ -111,7 +122,7 @@ func createDomainRepositoryFile(model string) {
 	fileName := strings.ToLower(model) + "_repository" + FileExtension
 
 	// ファイルの生成
-	fp, err := os.Create(fileName)
+	fp, err := os.Create(filepath.Join(DomainRepositoryPath, fileName))
 	if err != nil {
 		log.Println("error creating file", err)
 	}
@@ -124,7 +135,10 @@ func createDomainRepositoryFile(model string) {
 }
 
 func createServiceFile(model string, modelLower string) {
-	fmt.Println(modelLower)
+	if _, err := os.Stat(DomainServicePath); os.IsNotExist(err) {
+		log.Println("such file or directory does not exist. err = ", err)
+		return
+	}
 	data := DomainService{
 		Package:        "service",
 		Model:          model,
@@ -137,7 +151,7 @@ func createServiceFile(model string, modelLower string) {
 
 	fileName := data.ModelLowerCase + "_service" + FileExtension
 
-	fp, err := os.Create(fileName)
+	fp, err := os.Create(filepath.Join(DomainServicePath, fileName))
 	if err != nil {
 		log.Println("error creating file", err)
 	}
@@ -150,6 +164,10 @@ func createServiceFile(model string, modelLower string) {
 }
 
 func createDatabaseRepositoryFile(model string) {
+	if _, err := os.Stat(DatabaseRepositoryPath); os.IsNotExist(err) {
+		log.Println("such file or directory does not exist. err = ", err)
+		return
+	}
 	data := DatabaseRepository{
 		Package: "database",
 		Model:   model,
@@ -161,7 +179,7 @@ func createDatabaseRepositoryFile(model string) {
 
 	fileName := strings.ToLower(model) + "_repository" + FileExtension
 
-	fp, err := os.Create(fileName)
+	fp, err := os.Create(filepath.Join(DatabaseRepositoryPath, fileName))
 	if err != nil {
 		log.Println("error creating file", err)
 	}
@@ -174,6 +192,10 @@ func createDatabaseRepositoryFile(model string) {
 }
 
 func createInteractorFile(model string, modelLower string) {
+	if _, err := os.Stat(InteractorPath); os.IsNotExist(err) {
+		log.Println("such file or directory does not exist. err = ", err)
+		return
+	}
 	data := Interactor{
 		Package:        "interactor",
 		Model:          model,
@@ -186,7 +208,7 @@ func createInteractorFile(model string, modelLower string) {
 
 	fileName := data.ModelLowerCase + "_interactor" + FileExtension
 
-	fp, err := os.Create(fileName)
+	fp, err := os.Create(filepath.Join(InteractorPath, fileName))
 	if err != nil {
 		log.Println("error creating file", err)
 	}
@@ -199,8 +221,12 @@ func createInteractorFile(model string, modelLower string) {
 }
 
 func createControllerFile(model string, modelLower string) {
+	if _, err := os.Stat(ControllerPath); os.IsNotExist(err) {
+		log.Println("such file or directory does not exist. err = ", err)
+		return
+	}
 	data := Controller{
-		Package:        "controller",
+		Package:        "controllers",
 		Model:          model,
 		ModelLowerCase: modelLower,
 	}
@@ -211,7 +237,7 @@ func createControllerFile(model string, modelLower string) {
 
 	fileName := data.ModelLowerCase + "_controller" + FileExtension
 
-	fp, err := os.Create(fileName)
+	fp, err := os.Create(filepath.Join(ControllerPath, fileName))
 	if err != nil {
 		log.Println("error creating file", err)
 	}
@@ -232,6 +258,7 @@ func createControllerFile(model string, modelLower string) {
 	// New
 */
 
+// error とfile name をマップの中に詰め込む
 func FirstCharToLowerCase(model string) string {
 	s := model
 	a := []rune(s)
