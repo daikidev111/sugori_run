@@ -205,7 +205,7 @@ func createInteractorFile(model, modelLower string) {
 		return
 	}
 	data := Interactor{
-		Package:        "interactor",
+		Package:        "usecase",
 		Model:          model,
 		ModelLowerCase: modelLower,
 	}
