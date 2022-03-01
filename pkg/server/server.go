@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"22dojo-online/pkg/adapters/controllers"
-	"22dojo-online/pkg/adapters/middleware"
+	"22dojo-online/pkg/adapter/controllers"
+	"22dojo-online/pkg/adapter/middleware"
 	"22dojo-online/pkg/domain/service"
 	driver "22dojo-online/pkg/driver/mysql"
 	"22dojo-online/pkg/driver/mysql/database"

@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"22dojo-online/pkg/adapters/dcontext"
+	"22dojo-online/pkg/adapter/dcontext"
 	"22dojo-online/pkg/domain/entity"
 	"22dojo-online/pkg/errors"
 	"22dojo-online/pkg/usecase"
