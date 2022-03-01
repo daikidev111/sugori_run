@@ -39,7 +39,7 @@ func (us *UserService) SelectUserByPrimaryKey(userID string) (*entity.User, erro
 }
 
 func (us *UserService) SelectUserByAuthToken(authToken string) (*entity.User, error) {
-	user, err := us.UserRepository.SelectUserByPrimaryKey(authToken)
+	user, err := us.UserRepository.SelectUserByAuthToken(authToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query a user by auth token. err = %w", err)
 	}
