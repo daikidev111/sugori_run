@@ -4,13 +4,14 @@ package service
 Service ではドメインの仕様をチェックする
 */
 import (
-	"22dojo-online/pkg/domain/entity"
-	"22dojo-online/pkg/domain/repository"
-	"22dojo-online/pkg/driver/mysql/database"
 	"fmt"
 	"log"
 
 	"gopkg.in/go-playground/validator.v9"
+
+	"22dojo-online/pkg/domain/entity"
+	"22dojo-online/pkg/domain/repository"
+	"22dojo-online/pkg/driver/mysql/database"
 )
 
 type UserServiceInterface interface {
