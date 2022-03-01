@@ -1,26 +1,10 @@
-package response
+package errors
 
 import (
 	"encoding/json"
 	"log"
 	"net/http"
 )
-
-// Success HTTPコード:200 正常終了を処理する
-func Success(writer http.ResponseWriter, response interface{}) {
-	if response == nil {
-		return
-	}
-	data, err := json.Marshal(response)
-	if err != nil {
-		log.Println(err)
-		InternalServerError(writer, "marshal error")
-		return
-	}
-	if _, err := writer.Write(data); err != nil {
-		log.Println(err)
-	}
-}
 
 // BadRequest HTTPコード:400 BadRequestを処理する
 func BadRequest(writer http.ResponseWriter, message string) {

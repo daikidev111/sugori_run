@@ -4,35 +4,31 @@ import (
 	"log"
 	"net/http"
 
-	"22dojo-online/pkg/http/middleware"
-	"22dojo-online/pkg/server/handler"
+	"22dojo-online/pkg/adapters/controllers"
+	"22dojo-online/pkg/adapters/middleware"
+	driver "22dojo-online/pkg/driver/mysql"
+	"22dojo-online/pkg/usecase"
 )
 
 // Serve HTTPサーバを起動する
 func Serve(addr string) {
+	// var db *sql.DB
+
+	// m := middleware.NewAuth(db)
+
+	userController := controllers.NewUserController(driver.NewSQLHandler())
+	UserInteractor := usecase.NewUserInteractor(driver.NewSQLHandler())
+	m := middleware.NewAuth(UserInteractor)
+
 	/* ===== URLマッピングを行う ===== */
-	http.HandleFunc("/setting/get", get(handler.HandleSettingGet()))
-	http.HandleFunc("/user/create", post(handler.HandleUserCreate()))
+	http.HandleFunc("/setting/get", get(controllers.GetSetting()))
 
-	// middlewareは 22dojo-online/pkg/http/middleware パッケージを利用する
-	// middleware を利用することでauth_tokenありきのoperationができるようになる
 	http.HandleFunc("/user/get",
-		get(middleware.Authenticate(handler.HandleUserGet()))) // middleware.Authenticateでhandler funcを囲む
+		get(m.Authenticate(userController.GetUser())))
+	http.HandleFunc("/user/create",
+		post(userController.InsertUser()))
 	http.HandleFunc("/user/update",
-		post(middleware.Authenticate(handler.HandleUserUpdate())))
-
-	// Collection List の表示の際のhttp handler
-	http.HandleFunc("/collection/list",
-		get(middleware.Authenticate(handler.HandleCollectionGet())))
-
-	http.HandleFunc("/ranking/list",
-		get(middleware.Authenticate(handler.HandleRankingGet())))
-
-	http.HandleFunc("/gacha/draw",
-		post(middleware.Authenticate(handler.HandleGachaPost())))
-
-	http.HandleFunc("/game/finish",
-		post(middleware.Authenticate(handler.HandleGameFinishPost())))
+		post(m.Authenticate(userController.UpdateUser())))
 
 	/* ===== サーバの起動 ===== */
 	log.Println("Server running...")
