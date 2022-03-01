@@ -1,4 +1,4 @@
-package database
+package database // 0-> move to driver
 
 type SQLHandler interface {
 	Execute(string, ...interface{}) (Result, error)

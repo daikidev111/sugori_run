@@ -1,12 +1,11 @@
 package driver
 
 import (
+	"22dojo-online/pkg/driver/mysql/database"
 	"database/sql"
 	"fmt"
 	"log"
 	"os"
-
-	"22dojo-online/pkg/interfaces/database"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -14,11 +13,11 @@ import (
 // Driver名
 const driverName = "mysql"
 
-type SQLHandler struct {
+type SQLHandlerImpl struct {
 	Conn *sql.DB // Conn 各repositoryで利用するDB接続(Connection)情報
 }
 
-func NewSQLHandler() *SQLHandler {
+func NewSQLHandler() *SQLHandlerImpl {
 	/* ===== データベースへ接続する. ===== */
 	// ユーザ
 	user := os.Getenv("MYSQL_USER")
@@ -49,7 +48,7 @@ func NewSQLHandler() *SQLHandler {
 			"error=%+v",
 			user, password, host, port, db, err)
 	}
-	sqlHandler := new(SQLHandler)
+	sqlHandler := new(SQLHandlerImpl)
 	sqlHandler.Conn = conn
 	return sqlHandler
 }
@@ -81,7 +80,7 @@ func NewSQLHandler() *SQLHandler {
 // 	return err
 // }
 
-func (handler *SQLHandler) Execute(statement string, args ...interface{}) (database.Result, error) {
+func (handler *SQLHandlerImpl) Execute(statement string, args ...interface{}) (database.Result, error) {
 	res := SQLResult{}
 	result, err := handler.Conn.Exec(statement, args...)
 	if err != nil {
@@ -92,7 +91,7 @@ func (handler *SQLHandler) Execute(statement string, args ...interface{}) (datab
 }
 
 //nolint: rowserrcheck // this is why
-func (handler *SQLHandler) Query(statement string, args ...interface{}) (database.Rows, error) {
+func (handler *SQLHandlerImpl) Query(statement string, args ...interface{}) (database.Rows, error) {
 	rows, err := handler.Conn.Query(statement, args...)
 	if err != nil {
 		return new(SQLRows), err
@@ -102,7 +101,7 @@ func (handler *SQLHandler) Query(statement string, args ...interface{}) (databas
 	return row, nil
 }
 
-func (handler *SQLHandler) QueryRow(statement string, args ...interface{}) database.Row {
+func (handler *SQLHandlerImpl) QueryRow(statement string, args ...interface{}) database.Row {
 	queryRow := handler.Conn.QueryRow(statement, args...)
 	row := new(SQLRow)
 	row.Row = queryRow

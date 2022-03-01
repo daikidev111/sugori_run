@@ -7,14 +7,14 @@ import (
 
 	"22dojo-online/pkg/domain/entity"
 	driver "22dojo-online/pkg/driver/mysql"
-	"22dojo-online/pkg/interfaces/database"
+	"22dojo-online/pkg/driver/mysql/database"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 )
 
 func DummySQLHandler(db *sql.DB) database.SQLHandler {
-	SQLHandler := new(driver.SQLHandler)
+	SQLHandler := new(driver.SQLHandlerImpl)
 	SQLHandler.Conn = db
 	return SQLHandler
 }

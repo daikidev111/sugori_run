@@ -1,4 +1,4 @@
-package usecase
+package service
 
 import "22dojo-online/pkg/domain/entity"
 

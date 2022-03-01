@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	"22dojo-online/pkg/domain/entity"
-	"22dojo-online/pkg/interfaces/database"
+	"22dojo-online/pkg/domain/service"
+	"22dojo-online/pkg/driver/mysql/database"
 )
 
 type UserInteractor struct {
-	UserRepository UserRepository
+	UserRepository service.UserRepository
 }
 
 func NewUserInteractor(sqlHandler database.SQLHandler) *UserInteractor {
@@ -19,6 +20,7 @@ func NewUserInteractor(sqlHandler database.SQLHandler) *UserInteractor {
 	}
 }
 
+// change the func name to get user
 func (interactor *UserInteractor) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
 	user, err := interactor.UserRepository.SelectUserByPrimaryKey(userID)
 	if err != nil {
