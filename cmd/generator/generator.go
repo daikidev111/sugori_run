@@ -85,9 +85,10 @@ func createEntityFile(model string) {
 		Model:   model,
 		Models:  model + "s",
 	}
-	template, err := template.New("entity.tmpl").ParseFiles("entity.tmpl")
+	tmpl, err := template.New("entity.tmpl").ParseFiles("entity.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	fileName := strings.ToLower(model) + FileExtension
@@ -100,8 +101,9 @@ func createEntityFile(model string) {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = template.Execute(fp, data); err != nil {
-		log.Fatal(err)
+	if err = tmpl.Execute(fp, data); err != nil {
+		log.Println(err)
+		return
 	}
 }
 
@@ -114,9 +116,10 @@ func createDomainRepositoryFile(model string) {
 		Package: "repository",
 		Model:   model,
 	}
-	template, err := template.New("domain_repo.tmpl").ParseGlob("domain_repo.tmpl")
+	tmpl, err := template.New("domain_repo.tmpl").ParseGlob("domain_repo.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	fileName := strings.ToLower(model) + "_repository" + FileExtension
@@ -129,12 +132,13 @@ func createDomainRepositoryFile(model string) {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = template.Execute(fp, data); err != nil {
-		log.Fatal(err)
+	if err = tmpl.Execute(fp, data); err != nil {
+		log.Println(err)
+		return
 	}
 }
 
-func createServiceFile(model string, modelLower string) {
+func createServiceFile(model, modelLower string) {
 	if _, err := os.Stat(DomainServicePath); os.IsNotExist(err) {
 		log.Println("such file or directory does not exist. err = ", err)
 		return
@@ -144,9 +148,10 @@ func createServiceFile(model string, modelLower string) {
 		Model:          model,
 		ModelLowerCase: modelLower,
 	}
-	template, err := template.New("domain_service.tmpl").ParseGlob("domain_service.tmpl")
+	tmpl, err := template.New("domain_service.tmpl").ParseGlob("domain_service.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	fileName := data.ModelLowerCase + "_service" + FileExtension
@@ -158,8 +163,9 @@ func createServiceFile(model string, modelLower string) {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = template.Execute(fp, data); err != nil {
-		log.Fatal(err)
+	if err = tmpl.Execute(fp, data); err != nil {
+		log.Println(err)
+		return
 	}
 }
 
@@ -172,9 +178,10 @@ func createDatabaseRepositoryFile(model string) {
 		Package: "database",
 		Model:   model,
 	}
-	template, err := template.New("database_repository.tmpl").ParseGlob("database_repository.tmpl")
+	tmpl, err := template.New("database_repository.tmpl").ParseGlob("database_repository.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	fileName := strings.ToLower(model) + "_repository" + FileExtension
@@ -186,12 +193,13 @@ func createDatabaseRepositoryFile(model string) {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = template.Execute(fp, data); err != nil {
-		log.Fatal(err)
+	if err = tmpl.Execute(fp, data); err != nil {
+		log.Println(err)
+		return
 	}
 }
 
-func createInteractorFile(model string, modelLower string) {
+func createInteractorFile(model, modelLower string) {
 	if _, err := os.Stat(InteractorPath); os.IsNotExist(err) {
 		log.Println("such file or directory does not exist. err = ", err)
 		return
@@ -201,9 +209,10 @@ func createInteractorFile(model string, modelLower string) {
 		Model:          model,
 		ModelLowerCase: modelLower,
 	}
-	template, err := template.New("interactor.tmpl").ParseGlob("interactor.tmpl")
+	tmpl, err := template.New("interactor.tmpl").ParseGlob("interactor.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	fileName := data.ModelLowerCase + "_interactor" + FileExtension
@@ -215,12 +224,13 @@ func createInteractorFile(model string, modelLower string) {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = template.Execute(fp, data); err != nil {
-		log.Fatal(err)
+	if err = tmpl.Execute(fp, data); err != nil {
+		log.Println(err)
+		return
 	}
 }
 
-func createControllerFile(model string, modelLower string) {
+func createControllerFile(model, modelLower string) {
 	if _, err := os.Stat(ControllerPath); os.IsNotExist(err) {
 		log.Println("such file or directory does not exist. err = ", err)
 		return
@@ -230,9 +240,10 @@ func createControllerFile(model string, modelLower string) {
 		Model:          model,
 		ModelLowerCase: modelLower,
 	}
-	template, err := template.New("controller.tmpl").ParseGlob("controller.tmpl")
+	tmpl, err := template.New("controller.tmpl").ParseGlob("controller.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
 	fileName := data.ModelLowerCase + "_controller" + FileExtension
@@ -244,8 +255,9 @@ func createControllerFile(model string, modelLower string) {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = template.Execute(fp, data); err != nil {
-		log.Fatal(err)
+	if err = tmpl.Execute(fp, data); err != nil {
+		log.Println(err)
+		return
 	}
 }
 
