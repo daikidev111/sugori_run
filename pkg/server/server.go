@@ -12,10 +12,6 @@ import (
 
 // Serve HTTPサーバを起動する
 func Serve(addr string) {
-	// var db *sql.DB
-
-	// m := middleware.NewAuth(db)
-
 	userController := controllers.NewUserController(driver.NewSQLHandler())
 	UserInteractor := usecase.NewUserInteractor(driver.NewSQLHandler())
 	m := middleware.NewAuth(UserInteractor)
