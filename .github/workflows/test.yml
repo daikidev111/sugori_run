@@ -23,19 +23,19 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      # - name: use cache # ビルド時にキャッシュを聞かせる
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       ~/go/pkg/mod
-      #       ~/.cache/go-build
-      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-go-
+      - name: use cache # ビルド時にキャッシュを聞かせる
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       
-      # - name: get dependencies
-      #   run: | 
-      #     go mod download
+      - name: get dependencies
+        run: | 
+          go mod download
     
     # ビルドテストの開始 (セットアップ必須)
     build:
@@ -46,7 +46,7 @@ jobs:
         - name: build
           run: go build ./...
 
-      # unit やモックテストの開始 (セットアップ必須)
+    # unit やモックテストの開始 (セットアップ必須)
     test:
       needs: setup
       runs-on: ubuntu-latest
@@ -54,15 +54,6 @@ jobs:
         - uses: actions/checkout@v2
         - name: test
           run: go test ./... -v
-      
-      # - name: Test
-      #   run: 
-      #     go test -race -coverprofile="coverage.txt" -covermode=atomic ./...
-
-      # - name: upload coverage
-      #   uses: codecov/codecov-action@v1
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
         
       
         
