@@ -1,6 +1,8 @@
-package service
+package repository
 
-import "22dojo-online/pkg/domain/entity"
+import (
+	"22dojo-online/pkg/domain/entity"
+)
 
 type UserRepository interface {
 	SelectUserByPrimaryKey(string) (*entity.User, error)

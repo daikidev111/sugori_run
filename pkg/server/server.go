@@ -4,21 +4,22 @@ import (
 	"log"
 	"net/http"
 
-	"22dojo-online/pkg/adapters/controllers"
-	"22dojo-online/pkg/adapters/middleware"
+	"22dojo-online/pkg/adapter/controllers"
+	"22dojo-online/pkg/adapter/middleware"
+	"22dojo-online/pkg/domain/service"
 	driver "22dojo-online/pkg/driver/mysql"
+	"22dojo-online/pkg/driver/mysql/database"
 	"22dojo-online/pkg/usecase"
 )
 
 // Serve HTTPサーバを起動する
 func Serve(addr string) {
-	// var db *sql.DB
-
-	// m := middleware.NewAuth(db)
-
-	userController := controllers.NewUserController(driver.NewSQLHandler())
-	UserInteractor := usecase.NewUserInteractor(driver.NewSQLHandler())
-	m := middleware.NewAuth(UserInteractor)
+	db := driver.NewSQLHandler()
+	userRepo := database.NewUserRepository(db)
+	userService := service.NewUserService(userRepo)
+	userInteractor := usecase.NewUserInteractor(userService)
+	userController := controllers.NewUserController(userInteractor)
+	m := middleware.NewAuth(userInteractor)
 
 	/* ===== URLマッピングを行う ===== */
 	http.HandleFunc("/setting/get", get(controllers.GetSetting()))

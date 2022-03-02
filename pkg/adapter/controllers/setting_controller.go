@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"22dojo-online/pkg/constant"
+	"22dojo-online/pkg/domain/constant"
 	"22dojo-online/pkg/errors"
 )
 

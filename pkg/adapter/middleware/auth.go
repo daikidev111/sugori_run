@@ -5,17 +5,16 @@ import (
 	"log"
 	"net/http"
 
-	"22dojo-online/pkg/adapters/dcontext"
-	"22dojo-online/pkg/domain/entity"
+	"22dojo-online/pkg/adapter/dcontext"
 	"22dojo-online/pkg/errors"
 	"22dojo-online/pkg/usecase"
 )
 
 type Auth struct {
-	userInteractor *usecase.UserInteractor
+	userInteractor usecase.UserInteractorInterface
 }
 
-func NewAuth(userInteractor *usecase.UserInteractor) *Auth {
+func NewAuth(userInteractor usecase.UserInteractorInterface) *Auth {
 	return &Auth{
 		userInteractor: userInteractor,
 	}
@@ -35,9 +34,7 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		var user *entity.User
-		var err error
-		user, err = auth.userInteractor.SelectUserByAuthToken(token)
+		user, err := auth.userInteractor.SelectUserByAuthToken(token)
 		if err != nil {
 			log.Println(err)
 			errors.InternalServerError(writer, "Internal Server Error")
@@ -49,11 +46,11 @@ func (auth *Auth) Authenticate(nextFunc http.HandlerFunc) http.HandlerFunc {
 			errors.InternalServerError(writer, "Invalid token")
 			return
 		}
-		// if user == nil {
-		// 	log.Printf("user not found. token=%s", token)
-		// 	response.BadRequest(writer, "Invalid token")
-		// 	return
-		// }
+		if user == nil {
+			log.Printf("user not found. token=%s", token)
+			errors.BadRequest(writer, "Invalid token")
+			return
+		}
 
 		// ユーザIDをContextへ保存して以降の処理に利用する
 		ctx = dcontext.SetUserID(ctx, user.ID)

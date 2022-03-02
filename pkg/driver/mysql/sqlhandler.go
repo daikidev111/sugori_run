@@ -18,7 +18,7 @@ type SQLHandlerImpl struct {
 	Conn *sql.DB // Conn 各repositoryで利用するDB接続(Connection)情報
 }
 
-func NewSQLHandler() *SQLHandlerImpl {
+func NewSQLHandler() database.SQLHandler {
 	/* ===== データベースへ接続する. ===== */
 	// ユーザ
 	user := os.Getenv("MYSQL_USER")
@@ -53,33 +53,6 @@ func NewSQLHandler() *SQLHandlerImpl {
 	sqlHandler.Conn = conn
 	return sqlHandler
 }
-
-// // TODO: Make it abstract ...?
-// func Transact(ctx context.Context, db *sql.DB, txFunc func(*sql.Tx) error) (err error) {
-// 	tx, err := db.BeginTx(ctx, nil)
-// 	if err != nil {
-// 		log.Printf("Begin is failed %v", err)
-// 		return err
-// 	}
-// 	defer func() {
-// 		if p := recover(); p != nil {
-// 			if err := tx.Rollback(); err != nil {
-// 				log.Printf("Rollback is failed %v", err)
-// 			}
-// 			panic(p)
-// 		} else if err != nil {
-// 			if err := tx.Rollback(); err != nil {
-// 				log.Printf("Rollback is failed %v", err)
-// 			}
-// 		} else {
-// 			if err := tx.Commit(); err != nil {
-// 				log.Printf("Commit is failed: %v", err)
-// 			}
-// 		}
-// 	}()
-// 	err = txFunc(tx)
-// 	return err
-// }
 
 func (handler *SQLHandlerImpl) Execute(statement string, args ...interface{}) (database.Result, error) {
 	res := SQLResult{}

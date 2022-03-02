@@ -1,4 +1,4 @@
-package database
+package repository
 
 import (
 	"22dojo-online/pkg/domain/entity"
