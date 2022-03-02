@@ -32,26 +32,8 @@ jobs:
         run: | 
           go mod download
 
-      - run: go test ./pkg/router -v -coverprofile=coverage.txt -race -vet=off
-        env:
-          MYSQL_USERNAME: root
-          MYSQL_PASSWORD: ca-tech-dojo
-          MYSQL_HOSTNAME: 127.0.0.1
-          MYSQL_DATABASE: dojo_api
-      - uses: actions/upload-artifact@v2.3.1
-        with:
-          name: coverage.txt
-          path: coverage.txt
-            - run: go test ./pkg/router -v -coverprofile=coverage.txt -race -vet=off
-        env:
-          MYSQL_USERNAME: root
-          MYSQL_PASSWORD: ca-tech-dojo
-          MYSQL_HOSTNAME: 127.0.0.1
-          MYSQL_DATABASE: dojo_api
-      - uses: actions/upload-artifact@v2.3.1
-        with:
-          name: coverage.txt
-          path: coverage.txt
+      - name: test
+        run: go test -race -coverageprofile="coverage.txt" -covernode=atomic ./...
 
       
         
