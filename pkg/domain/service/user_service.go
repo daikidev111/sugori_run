@@ -10,7 +10,6 @@ import (
 
 	"22dojo-online/pkg/domain/entity"
 	"22dojo-online/pkg/domain/repository"
-	"22dojo-online/pkg/driver/mysql/database"
 )
 
 type UserServiceInterface interface {
@@ -20,17 +19,17 @@ type UserServiceInterface interface {
 	UpdateUserByPrimaryKey(user *entity.User) error
 }
 
-type UserService struct {
+type userService struct {
 	UserRepository repository.UserRepository
 }
 
-func NewUserService(userRepository *database.UserRepository) *UserService {
-	return &UserService{
+func NewUserService(userRepository repository.UserRepository) UserServiceInterface {
+	return &userService{
 		UserRepository: userRepository,
 	}
 }
 
-func (us *UserService) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
+func (us *userService) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
 	user, err := us.UserRepository.SelectUserByPrimaryKey(userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query a user by primary key. err = %w", err)
@@ -38,7 +37,7 @@ func (us *UserService) SelectUserByPrimaryKey(userID string) (*entity.User, erro
 	return user, nil
 }
 
-func (us *UserService) SelectUserByAuthToken(authToken string) (*entity.User, error) {
+func (us *userService) SelectUserByAuthToken(authToken string) (*entity.User, error) {
 	user, err := us.UserRepository.SelectUserByAuthToken(authToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query a user by auth token. err = %w", err)
@@ -46,7 +45,7 @@ func (us *UserService) SelectUserByAuthToken(authToken string) (*entity.User, er
 	return user, nil
 }
 
-func (us *UserService) InsertUser(user *entity.User) error {
+func (us *userService) InsertUser(user *entity.User) error {
 	if user.Name == "" {
 		validate := validator.New()
 		err := validate.Struct(user)
@@ -58,7 +57,7 @@ func (us *UserService) InsertUser(user *entity.User) error {
 	return nil
 }
 
-func (us *UserService) UpdateUserByPrimaryKey(user *entity.User) error {
+func (us *userService) UpdateUserByPrimaryKey(user *entity.User) error {
 	if user.Name == "" {
 		validate := validator.New()
 		err := validate.Struct(user)

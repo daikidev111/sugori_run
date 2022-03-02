@@ -7,11 +7,18 @@ import (
 	"22dojo-online/pkg/domain/service"
 )
 
+type UserInteractorInterface interface {
+	SelectUserByPrimaryKey(string) (*entity.User, error)
+	SelectUserByAuthToken(string) (*entity.User, error)
+	InsertUser(user *entity.User) error
+	UpdateUserByPrimaryKey(user *entity.User) error
+}
+
 type UserInteractor struct {
 	UserService service.UserServiceInterface
 }
 
-func NewUserInteractor(userService service.UserServiceInterface) *UserInteractor {
+func NewUserInteractor(userService service.UserServiceInterface) UserInteractorInterface {
 	return &UserInteractor{
 		UserService: userService,
 	}

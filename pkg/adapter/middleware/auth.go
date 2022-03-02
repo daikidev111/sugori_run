@@ -11,10 +11,10 @@ import (
 )
 
 type Auth struct {
-	userInteractor *usecase.UserInteractor
+	userInteractor usecase.UserInteractorInterface
 }
 
-func NewAuth(userInteractor *usecase.UserInteractor) *Auth {
+func NewAuth(userInteractor usecase.UserInteractorInterface) *Auth {
 	return &Auth{
 		userInteractor: userInteractor,
 	}

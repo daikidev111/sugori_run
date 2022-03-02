@@ -15,7 +15,7 @@ import (
 )
 
 type UserController struct {
-	Interactor *usecase.UserInteractor
+	Interactor usecase.UserInteractorInterface
 }
 
 type UserCreateRequest struct {
@@ -37,7 +37,7 @@ type UserCreateResponse struct {
 	Token string `json:"token"`
 }
 
-func NewUserController(ui *usecase.UserInteractor) *UserController {
+func NewUserController(ui usecase.UserInteractorInterface) *UserController {
 	return &UserController{
 		Interactor: ui,
 	}
@@ -52,7 +52,6 @@ func (controller *UserController) GetUser() http.HandlerFunc {
 			errors.InternalServerError(writer, "Internal Server Error")
 			return
 		}
-		log.Println(userID)
 
 		user, err := controller.Interactor.SelectUserByPrimaryKey(userID)
 		if err != nil {
