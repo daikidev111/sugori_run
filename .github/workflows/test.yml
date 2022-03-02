@@ -28,9 +28,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       
-      # - name: get dependencies
-      #   run: | 
-          # go mod download
+      - name: get dependencies
+        run: | 
+          go mod download
     
     # unit やモックテストの開始 (セットアップ必須)
     # test:
