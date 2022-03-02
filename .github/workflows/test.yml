@@ -36,6 +36,24 @@ jobs:
       - name: get dependencies
         run: | 
           go mod download
+    
+    # ビルドテストの開始 (セットアップ必須)
+    build:
+      needs: setup
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: build
+          run: go build ./...
+
+      # unit やモックテストの開始 (セットアップ必須)
+    test:
+      needs: setup
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: test
+          run: go test ./... -v
       
       # - name: Test
       #   run: 
