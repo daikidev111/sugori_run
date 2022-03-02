@@ -1,10 +1,6 @@
 name: test
 
-on:
-  push:
-    branches:
-      - feature/daiki_kubo/githubAction
-  pull_request:
+on: [push, pull_request]
 
 jobs:
   test:
@@ -23,18 +19,18 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: restore cache # modにキャッシュを効かせる
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+      # - name: restore cache # modにキャッシュを効かせる
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       ~/go/pkg/mod
+      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-go-
       
-      - name: get dependencies
-        run: | 
-          go mod download
+      # - name: get dependencies
+      #   run: | 
+          # go mod download
     
     # unit やモックテストの開始 (セットアップ必須)
     test:
