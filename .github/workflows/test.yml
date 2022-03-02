@@ -37,14 +37,14 @@ jobs:
         run: | 
           go mod download
       
-      - name: Test
-        run: 
-          go test -race -coverprofile="coverage.txt" -covermode=atomic ./...
+      # - name: Test
+      #   run: 
+      #     go test -race -coverprofile="coverage.txt" -covermode=atomic ./...
 
-      - name: upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+      # - name: upload coverage
+      #   uses: codecov/codecov-action@v1
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
         
       
         
