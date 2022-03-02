@@ -51,7 +51,7 @@ const (
 
 //  go run generator.go -model="User"
 func main() {
-	f := flag.String("model", "None", "This is to generate files based on the model name")
+	f := flag.String("model", "", "This is to generate files based on the model name")
 	flag.Parse()
 	words := strings.Fields(*f)
 
@@ -67,6 +67,7 @@ func main() {
 		modelFCharLowerCase = FirstCharToLowerCase(model)
 	} else {
 		log.Println("Does not accept empty word")
+		return
 	}
 	createEntityFile(model)
 	createDomainRepositoryFile(model)
