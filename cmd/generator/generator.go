@@ -49,7 +49,7 @@ const (
 	controllerPath         = "./../../pkg/adapter/controllers/"
 )
 
-//  go run generator.go -model="User"
+//  go run generator.go -model="User" file=""
 func main() {
 	f := flag.String("model", "", "This is to generate files based on the model name")
 	flag.Parse()
