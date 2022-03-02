@@ -23,19 +23,19 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: use cache # ビルド時にキャッシュを聞かせる
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+      # - name: use cache # ビルド時にキャッシュを聞かせる
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       ~/go/pkg/mod
+      #       ~/.cache/go-build
+      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-go-
       
-      - name: get dependencies
-        run: | 
-          go mod download
+      # - name: get dependencies
+      #   run: | 
+      #     go mod download
     
     # ビルドテストの開始 (セットアップ必須)
     build:
