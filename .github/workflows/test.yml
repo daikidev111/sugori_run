@@ -31,12 +31,10 @@ jobs:
       - name: get dependencies
         run: | 
           go mod download
-    
-    test:
-      steps:
-        - uses: actions/checkout@v2
-        - name: test
-          run: go test ./... -v
+
+      - name: test
+        uses: actions/checkout@v2
+        run: go test ./... -v
 
       
         
