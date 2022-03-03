@@ -257,11 +257,6 @@ func FirstCharToLowerCase(model string) string {
 
 //nolint: gocyclo // this is why
 func fileSelection(model, modelFCharLowerCase string, file []string) []error {
-	// v = {
-	// 	"database repo": createDatabaseRepository
-	// }
-	// v["database repo"](model)
-
 	for _, v := range file {
 		v = strings.ToLower(v) // make all the chars lower case in case of some capitalized chars
 		validate := true
