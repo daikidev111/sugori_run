@@ -96,7 +96,7 @@ func createEntityFile(model string) error {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = tmpl.Execute(fp, data); err != nil {
+	if err := tmpl.Execute(fp, data); err != nil {
 		return err
 	}
 	return nil
@@ -125,7 +125,7 @@ func createDomainRepositoryFile(model string) error {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = tmpl.Execute(fp, data); err != nil {
+	if err := tmpl.Execute(fp, data); err != nil {
 		return err
 	}
 	return nil
@@ -154,7 +154,7 @@ func createServiceFile(model, modelLower string) error {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = tmpl.Execute(fp, data); err != nil {
+	if err := tmpl.Execute(fp, data); err != nil {
 		return err
 	}
 	return nil
@@ -182,7 +182,7 @@ func createDatabaseRepositoryFile(model string) error {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = tmpl.Execute(fp, data); err != nil {
+	if err := tmpl.Execute(fp, data); err != nil {
 		return err
 	}
 	return nil
@@ -211,7 +211,7 @@ func createInteractorFile(model, modelLower string) error {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = tmpl.Execute(fp, data); err != nil {
+	if err := tmpl.Execute(fp, data); err != nil {
 		return err
 	}
 	return nil
@@ -240,7 +240,7 @@ func createControllerFile(model, modelLower string) error {
 	defer fp.Close()
 
 	// ファイルへの書き込み
-	if err = tmpl.Execute(fp, data); err != nil {
+	if err := tmpl.Execute(fp, data); err != nil {
 		return err
 	}
 	return nil
@@ -255,6 +255,7 @@ func FirstCharToLowerCase(model string) string {
 	return s
 }
 
+//nolint: gocyclo // this is why
 func fileSelection(model, modelFCharLowerCase string, file []string) []error {
 	for _, v := range file {
 		v = strings.ToLower(v) // make all the chars lower case in case of some capitalized chars
@@ -353,15 +354,13 @@ func fileSelection(model, modelFCharLowerCase string, file []string) []error {
 			errors = append(errors, fmt.Errorf("error with the file generation. Please check if it is entered according to its instruction"))
 			return errors
 		}
-
 	}
 	return nil
 }
 
-func convertModelInputToModel(modelInput *string) (string, string) {
+func convertModelInputToModel(modelInput *string) (model, modelFCharLowerCase string) {
 	words := strings.Fields(*modelInput)
-	var model string
-	var modelFCharLowerCase string
+
 	if len(words) > 1 {
 		for _, v := range words {
 			model += strings.Title(strings.ToLower(v))
