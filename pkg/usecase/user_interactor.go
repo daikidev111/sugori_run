@@ -24,7 +24,6 @@ func NewUserInteractor(userService service.UserServiceInterface) UserInteractorI
 	}
 }
 
-//TODO: change the func name to get user
 func (ui *UserInteractor) SelectUserByPrimaryKey(userID string) (*entity.User, error) {
 	user, err := ui.UserService.SelectUserByPrimaryKey(userID)
 	if err != nil {

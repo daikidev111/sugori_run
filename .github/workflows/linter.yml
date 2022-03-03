@@ -1,9 +1,9 @@
 name: Linter
 
 on:
-  push:
-    paths:
-      - '**.go'
+  # push:
+  #   paths:
+  #     - '**.go'
   pull_request:
     paths:
       - '**.go'

@@ -1,8 +1,10 @@
+//no lint ()
 package mock_service
 
 import (
-	entity "22dojo-online/pkg/domain/entity"
 	"testing"
+
+	entity "22dojo-online/pkg/domain/entity"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
