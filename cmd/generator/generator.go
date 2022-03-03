@@ -50,17 +50,16 @@ const (
 	controllerPath         = "./../../pkg/adapter/controllers/"
 )
 
-//  go run generator.go -model="User" file=""
+//  go run generator.go -model="User" -file=""
 
 // WARNING: space after the , will be determined as an invalid command
 func main() {
-	f := flag.String("model", "", "This is to generate files based on the model name")
-	m := flag.String("file", "", "This is to determine which files to generate")
+	m := flag.String("model", "", "This is to generate files based on the model name")
+	f := flag.String("file", "", "This is to determine which files to generate")
 	flag.Parse()
+	file := strings.Split(*f, ",")
 
-	file := strings.Split(*m, ",")
-
-	model, modelFCharLowerCase := convertModelInputToModel(f)
+	model, modelFCharLowerCase := convertModelInputToModel(m)
 	if model == "" && modelFCharLowerCase == "" {
 		return
 	}
@@ -75,7 +74,6 @@ func main() {
 
 func createEntityFile(model string) error {
 	if _, err := os.Stat(entityPath); os.IsNotExist(err) {
-		log.Println("such file or directory does not exist. err = ", err)
 		return err
 	}
 	data := Entity{
@@ -85,7 +83,6 @@ func createEntityFile(model string) error {
 	}
 	tmpl, err := template.New("entity.tmpl").ParseFiles("entity.tmpl")
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -94,14 +91,12 @@ func createEntityFile(model string) error {
 	// ファイルの生成
 	fp, err := os.Create(filepath.Join(entityPath, fileName))
 	if err != nil {
-		log.Println("error creating file", err)
 		return err
 	}
 	defer fp.Close()
 
 	// ファイルへの書き込み
 	if err = tmpl.Execute(fp, data); err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -109,7 +104,6 @@ func createEntityFile(model string) error {
 
 func createDomainRepositoryFile(model string) error {
 	if _, err := os.Stat(domainRepositoryPath); os.IsNotExist(err) {
-		log.Println("such file or directory does not exist. err = ", err)
 		return err
 	}
 	data := DomainRepository{
@@ -118,7 +112,6 @@ func createDomainRepositoryFile(model string) error {
 	}
 	tmpl, err := template.New("domain_repo.tmpl").ParseGlob("domain_repo.tmpl")
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -127,13 +120,12 @@ func createDomainRepositoryFile(model string) error {
 	// ファイルの生成
 	fp, err := os.Create(filepath.Join(domainRepositoryPath, fileName))
 	if err != nil {
-		log.Println("error creating file", err)
+		return err
 	}
 	defer fp.Close()
 
 	// ファイルへの書き込み
 	if err = tmpl.Execute(fp, data); err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -141,7 +133,6 @@ func createDomainRepositoryFile(model string) error {
 
 func createServiceFile(model, modelLower string) error {
 	if _, err := os.Stat(domainServicePath); os.IsNotExist(err) {
-		log.Println("such file or directory does not exist. err = ", err)
 		return err
 	}
 	data := DomainService{
@@ -151,7 +142,6 @@ func createServiceFile(model, modelLower string) error {
 	}
 	tmpl, err := template.New("domain_service.tmpl").ParseGlob("domain_service.tmpl")
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -159,14 +149,12 @@ func createServiceFile(model, modelLower string) error {
 
 	fp, err := os.Create(filepath.Join(domainServicePath, fileName))
 	if err != nil {
-		log.Println("error creating file", err)
 		return err
 	}
 	defer fp.Close()
 
 	// ファイルへの書き込み
 	if err = tmpl.Execute(fp, data); err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -174,7 +162,6 @@ func createServiceFile(model, modelLower string) error {
 
 func createDatabaseRepositoryFile(model string) error {
 	if _, err := os.Stat(databaseRepositoryPath); os.IsNotExist(err) {
-		log.Println("such file or directory does not exist. err = ", err)
 		return err
 	}
 	data := DatabaseRepository{
@@ -183,7 +170,6 @@ func createDatabaseRepositoryFile(model string) error {
 	}
 	tmpl, err := template.New("database_repository.tmpl").ParseGlob("database_repository.tmpl")
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -191,14 +177,12 @@ func createDatabaseRepositoryFile(model string) error {
 
 	fp, err := os.Create(filepath.Join(databaseRepositoryPath, fileName))
 	if err != nil {
-		log.Println("error creating file", err)
 		return err
 	}
 	defer fp.Close()
 
 	// ファイルへの書き込み
 	if err = tmpl.Execute(fp, data); err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -206,7 +190,6 @@ func createDatabaseRepositoryFile(model string) error {
 
 func createInteractorFile(model, modelLower string) error {
 	if _, err := os.Stat(interactorPath); os.IsNotExist(err) {
-		log.Println("such file or directory does not exist. err = ", err)
 		return err
 	}
 	data := Interactor{
@@ -216,7 +199,6 @@ func createInteractorFile(model, modelLower string) error {
 	}
 	tmpl, err := template.New("interactor.tmpl").ParseGlob("interactor.tmpl")
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -224,14 +206,12 @@ func createInteractorFile(model, modelLower string) error {
 
 	fp, err := os.Create(filepath.Join(interactorPath, fileName))
 	if err != nil {
-		log.Println("error creating file", err)
 		return err
 	}
 	defer fp.Close()
 
 	// ファイルへの書き込み
 	if err = tmpl.Execute(fp, data); err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -239,7 +219,6 @@ func createInteractorFile(model, modelLower string) error {
 
 func createControllerFile(model, modelLower string) error {
 	if _, err := os.Stat(controllerPath); os.IsNotExist(err) {
-		log.Println("such file or directory does not exist. err = ", err)
 		return err
 	}
 	data := Controller{
@@ -249,7 +228,6 @@ func createControllerFile(model, modelLower string) error {
 	}
 	tmpl, err := template.New("controller.tmpl").ParseGlob("controller.tmpl")
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 
@@ -257,14 +235,12 @@ func createControllerFile(model, modelLower string) error {
 
 	fp, err := os.Create(filepath.Join(controllerPath, fileName))
 	if err != nil {
-		log.Println("error creating file", err)
 		return err
 	}
 	defer fp.Close()
 
 	// ファイルへの書き込み
 	if err = tmpl.Execute(fp, data); err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil
@@ -290,7 +266,7 @@ func fileSelection(model, modelFCharLowerCase string, file []string) []error {
 			errors = append(errors, fmt.Errorf("does not accept empty file or invalid file name"))
 			return errors
 
-		case v == "database repository" || v == "data repo" || v == "database repo":
+		case v == "databaserepo" || v == "databaseRepo" || v == "Databaserepo":
 			err = createDatabaseRepositoryFile(model)
 			if err != nil {
 				errors = append(errors, fmt.Errorf("failed to generate a database repository file = %w", err))
@@ -306,7 +282,7 @@ func fileSelection(model, modelFCharLowerCase string, file []string) []error {
 			}
 			fmt.Printf("successfully generated a file %s\n", v)
 
-		case v == "domain repository" || v == "domain repo":
+		case v == "domainRepository" || v == "Domainrepo" || v == "domainrepo" || v == "Domainrepository":
 			err = createDomainRepositoryFile(model)
 			if err != nil {
 				errors = append(errors, fmt.Errorf("failed to generate a domain repository file = %w", err))
@@ -314,7 +290,7 @@ func fileSelection(model, modelFCharLowerCase string, file []string) []error {
 			}
 			fmt.Printf("successfully generated a file %s\n", v)
 
-		case v == "domain service":
+		case v == "domainService" || v == "Domainservice":
 			err = createServiceFile(model, modelFCharLowerCase)
 			if err != nil {
 				errors = append(errors, fmt.Errorf("failed to generate a service file = %w", err))
