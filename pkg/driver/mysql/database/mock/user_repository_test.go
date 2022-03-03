@@ -167,10 +167,15 @@ func TestUpdateUser(t *testing.T) {
 
 	for _, tt := range table {
 		t.Run(tt.testName, func(t *testing.T) {
-			b := &tt.user
-			mock.ExpectExec(regexp.QuoteMeta(query)).WithArgs("whatt", tt.id).WillReturnResult(sqlmock.NewResult(1, 1))
-			err = repo.UpdateUserByPrimaryKey(b)
-			assert.Equal(t, tt.err, err)
+			mock.ExpectExec(regexp.QuoteMeta(query)).WithArgs(tt.nameToChange, tt.id).WillReturnResult(sqlmock.NewResult(1, 1))
+			tt.user.Name = "whattt"
+			if err = repo.UpdateUserByPrimaryKey(&tt.user); err != nil {
+				t.Errorf("error was not expected while updating stats: %s", err)
+			}
+
+			if err := mock.ExpectationsWereMet(); err != nil {
+				t.Errorf("there were unfulfilled expections: %s", err)
+			}
 		})
 	}
 }
