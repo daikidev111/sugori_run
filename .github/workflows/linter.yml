@@ -1,9 +1,8 @@
 name: Linter
 
-on:
-  pull_request:
-    paths:
-      - '**.go'
+on: [push, pull_request]
+  paths:
+    - '**.go'
 jobs:
   golangci-lint:
     runs-on: ubuntu-latest
