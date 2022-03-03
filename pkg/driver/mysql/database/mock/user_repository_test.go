@@ -73,9 +73,6 @@ func TestSelectUserByPrimaryKey(t *testing.T) {
 				"id", "auth_token", "name", "high_score", "coin",
 			}).AddRow(b.ID, b.AuthToken, b.Name, b.HighScore, b.Coin)
 			mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(tt.id).WillReturnRows(rows)
-			// ExpectQuery expects Query() or QueryRow() to be called with expectedSQL query.
-			// the *ExpectedQuery allows to mock database response.
-
 			got, err := repo.SelectUserByPrimaryKey(b.ID)
 
 			assert.Equal(t, tt.err, err)
@@ -84,55 +81,103 @@ func TestSelectUserByPrimaryKey(t *testing.T) {
 	}
 }
 
-// func TestSelectUserByAuthToken(t *testing.T) {
-// 	// table for test
-// 	table := []struct {
-// 		testName string
-// 		id       string
-// 		user     entity.User
-// 		err      error
-// 	}{
-// 		{
-// 			"FIRST TEST CASE: SelectUserByPrimaryKey from pkg/interfaces/database/user_repository.go",
-// 			"78164dcf-6b7c-45e4-862a-2a0f6735a449",
-// 			entity.User{
-// 				ID:        "78164dcf-6b7c-45e4-862a-2a0f6735a449",
-// 				AuthToken: "b187b9e0-08e6-42dd-a9b3-a900b137983c",
-// 				Name:      "whatt",
-// 				HighScore: 100,
-// 				Coin:      47800,
-// 			},
-// 			nil,
-// 		},
-// 	}
+// TODO: check how to do the insert user test
 
-// 	/*   prepare   */
-// 	db, mock, err := sqlmock.New()
-// 	if err != nil {
-// 		t.Error("sqlmock not work")
-// 	}
-// 	defer db.Close()
+func TestInsertUser(t *testing.T) {
+	table := []struct {
+		testName string
+		id       string
+		user     entity.User
+		err      error
+	}{
+		{
+			"FIRST TEST CASE: InsertUser from pkg/interfaces/database/user_repository.go",
+			"78164dcf-6b7c-45e4-862a-2a0f6735a449",
+			entity.User{
+				ID:        "",
+				AuthToken: "",
+				Name:      "Mock 1",
+				HighScore: 0,
+				Coin:      0,
+			},
+			nil,
+		},
+	}
 
-// 	repo := &database.UserRepository{
-// 		SQLHandler: DummySQLHandler(db),
-// 	}
+	/*   prepare   */
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Error("sqlmock not work")
+	}
+	defer db.Close()
 
-// 	query := "SELECT `id`, `auth_token`, `name`, `high_score`, `coin` FROM `user` WHERE `auth_token`= ?"
+	repo := &database.UserRepository{
+		SQLHandler: DummySQLHandler(db),
+	}
 
-// 	for _, tt := range table {
-// 		t.Run(tt.testName, func(t *testing.T) {
-// 			b := &tt.user
-// 			rows := sqlmock.NewRows([]string{
-// 				"id", "auth_token", "name", "high_score", "coin",
-// 			}).AddRow(b.ID, b.AuthToken, b.Name, b.HighScore, b.Coin)
-// 			mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(tt.id).WillReturnRows(rows)
-// 			// ExpectQuery expects Query() or QueryRow() to be called with expectedSQL query.
-// 			// the *ExpectedQuery allows to mock database response.
+	query := "INSERT INTO `user` (`id`, `auth_token`, `name`, `high_score`, `coin`) VALUES (?, ?, ?, ?, ?);"
 
-// 			got, err := repo.SelectUserByAuthToken(b.AuthToken)
+	for _, tt := range table {
+		t.Run(tt.testName, func(t *testing.T) {
+			b := &tt.user
+			rows := sqlmock.NewRows([]string{
+				"id", "auth_token", "name", "high_score", "coin",
+			}).AddRow(b.ID, b.AuthToken, b.Name, b.HighScore, b.Coin)
+			mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(tt.id).WillReturnRows(rows)
+			got, err := repo.SelectUserByPrimaryKey(b.ID)
 
-// 			assert.Equal(t, tt.err, err)
-// 			assert.Equal(t, b, got)
-// 		})
-// 	}
-// }
+			assert.Equal(t, tt.err, err)
+			assert.Equal(t, b, got)
+		})
+	}
+}
+
+// TODO: Figure out how to do the mock test for updateUser
+func TestUpdateUser(t *testing.T) {
+	table := []struct {
+		testName string
+		id       string
+		user     entity.User
+		err      error
+	}{
+		{
+			"FIRST TEST CASE: InsertUser from pkg/interfaces/database/user_repository.go",
+			"78164dcf-6b7c-45e4-862a-2a0f6735a449",
+			entity.User{
+				ID:        "78164dcf-6b7c-45e4-862a-2a0f6735a449",
+				AuthToken: "b187b9e0-08e6-42dd-a9b3-a900b137983c",
+				Name:      "whatt",
+				HighScore: 100,
+				Coin:      10000,
+			},
+			nil,
+		},
+	}
+
+	/*   prepare   */
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Error("sqlmock not work")
+	}
+	defer db.Close()
+
+	repo := &database.UserRepository{
+		SQLHandler: DummySQLHandler(db),
+	}
+
+	query := "UPDATE user SET name = ? WHERE id = ?"
+
+	for _, tt := range table {
+		t.Run(tt.testName, func(t *testing.T) {
+			b := &tt.user
+			rows := sqlmock.NewRows([]string{
+				"id", "auth_token", "name", "high_score", "coin",
+			}).AddRow(b.ID, b.AuthToken, b.Name, b.HighScore, b.Coin)
+			mock.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(tt.id).WillReturnRows(rows)
+			got, err := repo.SelectUserByPrimaryKey(b.ID)
+
+			assert.Equal(t, tt.err, err)
+			assert.Equal(t, b, got)
+		})
+	}
+}
