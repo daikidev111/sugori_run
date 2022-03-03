@@ -207,7 +207,6 @@ func TestInsertUser(t *testing.T) {
 			if err = repo.InsertUser(&tt.user); err != nil {
 				t.Errorf("error was not expected while updating stats: %s", err)
 			}
-
 			if err := mock.ExpectationsWereMet(); err != nil {
 				t.Errorf("there were unfulfilled expections: %s", err)
 			}
