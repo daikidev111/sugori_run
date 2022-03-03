@@ -161,7 +161,7 @@ func TestUpdateUser(t *testing.T) {
 			}
 
 			if err := mock.ExpectationsWereMet(); err != nil {
-				t.Errorf("there were unfulfilled expections: %s", err)
+				t.Errorf("there were unfulfilled expectaions: %s", err)
 			}
 		})
 	}
@@ -208,7 +208,7 @@ func TestInsertUser(t *testing.T) {
 				t.Errorf("error was not expected while updating stats: %s", err)
 			}
 			if err := mock.ExpectationsWereMet(); err != nil {
-				t.Errorf("there were unfulfilled expections: %s", err)
+				t.Errorf("there were unfulfilled expectaions: %s", err)
 			}
 		})
 	}
