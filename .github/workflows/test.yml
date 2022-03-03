@@ -33,7 +33,6 @@ jobs:
           go mod download
 
       - name: test
-        uses: actions/checkout@v2
         run: go test ./... -v
 
       
