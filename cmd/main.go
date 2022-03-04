@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"22dojo-online/pkg/server"
+
+	"github.com/pkg/profile"
 )
 
 var (
@@ -20,5 +22,7 @@ func init() {
 }
 
 func main() {
+	defer profile.Start(profile.ProfilePath(".")).Stop()
+
 	server.Serve(addr)
 }
