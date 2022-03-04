@@ -1,4 +1,3 @@
-//no lint ()
 package mock_service
 
 import (
