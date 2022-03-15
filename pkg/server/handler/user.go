@@ -41,7 +41,6 @@ func HandleUserCreate() http.HandlerFunc {
 		}
 
 		// データベースにユーザデータを登録する
-		// TODO: ユーザデータの登録クエリを入力する
 		err = model.InsertUser(&model.User{
 			ID:        userID.String(),
 			AuthToken: authToken.String(),
@@ -80,9 +79,9 @@ func HandleUserGet() http.HandlerFunc {
 			return
 		}
 
-		// TODO: ユーザデータの取得処理を実装 (ヒント: model.SelectUserByPrimaryKeyを使用する)
 		var user *model.User
 		var err error
+		user, err = model.SelectUserByPrimaryKey(userID)
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
@@ -131,9 +130,9 @@ func HandleUserUpdate() http.HandlerFunc {
 			return
 		}
 
-		// TODO: ユーザデータの取得処理と存在チェックを実装 (ヒント: model.SelectUserByPrimaryKeyを使用する)
 		var user *model.User
 		var err error
+		user, err = model.SelectUserByPrimaryKey(userID) //
 		if err != nil {
 			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
@@ -145,9 +144,9 @@ func HandleUserUpdate() http.HandlerFunc {
 			return
 		}
 
-		// TODO: userテーブルの更新処理を実装 (ヒント: model.UpdateUserByPrimaryKeyを使用する)
+		user.Name = requestBody.Name
+		err = model.UpdateUserByPrimaryKey(user)
 		if err != nil {
-			log.Println(err)
 			response.InternalServerError(writer, "Internal Server Error")
 			return
 		}
