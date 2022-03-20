@@ -1,9 +1,39 @@
 # 概要
 
 CA Tech Dojo Onlineで「スゴリらん！」というゲームのAPI実装を通してGo言語を使用したバックエンド開発をしました。<br>
-「スゴリらん！」は8つのAPIを必要とし、そのうち7つのAPIを期間中に実装していきます。<br>
+「スゴリらん！」は8つのAPIを必要とし、そのうち7つのAPIを1週間で実装することができました。</br>
 
-具体的な内容は[こちら](./TASKS.md)。
+以下が私が実装したAPIです。
+1. /user/create
+2. /user/get
+3. /user/update
+4. /collection/list
+5. /ranking/list
+6. /game/finish
+7. /gacha/draw
+
+**考慮した点：**
+
+4. /collection/list
+    n+1問題が発生していないか。
+
+5. /ranking/list
+    リクエストパラメータに不正な値が設定されている場合を考慮できているか。
+    (start にマイナス値やランキングに登録されているスコア数を超過した値が設定されている場合の考慮)
+    不要なデータの取得を行っていないか。(ユーザーデータの全件取得等)
+    
+6. /game/finish
+    リクエストパラメータに不正な値が設定されている場合を考慮できているか。
+    (score にマイナス値が設定されている場合の考慮)
+    更新処理にTransactionを利用しているか。
+
+7. /gacha/draw
+    リクエストパラメータに不正な値が設定されている場合を考慮できているか。
+    (times にマイナス値やAPIサーバやDBに負荷がかかってしまうような大きな値が設定されている場合の考慮)
+    n+1問題が発生していないか。
+    コレクションアイテムのINSERTクエリが獲得数分発行されていないか。
+    (更新負荷がかかる仕組みになってしまうためINSERTクエリはbulk insertを使用)
+    Transactionを利用して原子性が担保されているか。
 
 【ゲーム画面】
 ![ゲーム画面](./img/game_view.png)
@@ -39,8 +69,7 @@ $ make fmt
 ```
 $ make lint
 ```
-を実行して開発を進めましょう。<br>
-それぞれのコマンドが何を行っているか知りたいときはこのリポジトリ内のMakefileを見てみましょう。
+を実行して開発を進めました。<br>
 
 ## docker-composeを利用したMySQLとRedisの準備
 ### MySQL
@@ -51,8 +80,6 @@ $ docker-compose up mysql
 を実行することでローカルのDocker上にMySQLサーバが起動します。<br>
 <br>
 初回起動時に db/init ディレクトリ内のDDL, DMLを読み込みデータベースの初期化を行います。<br>
-(DDL(DataDefinitionLanguage)とはデータベースの構造や構成を定義するためのSQL文)<br>
-(DML(DataManipulationLanguage)とはデータの管理・操作を定義するためのSQL文)
 
 #### PHPMyAdmin
 MySQLデータベースのテーブルやレコードの閲覧、変更するためのツールとしてPHPMyAdminを用意しています。
@@ -64,27 +91,9 @@ PHPMyAdminサーバ起動後以下のURLからアクセスすることができ�
 
 PHPMyAdmin: <http://localhost:4000/>
 
-#### MySQLWorkbenchの設定
-※ dockerの環境設定が上手くいかなかった場合に利用推奨<br>
-Download: https://www.mysql.com/jp/products/workbench/
-
-MySQLへの接続設定をします。
-1. MySQL Connections の + を選択
-2. 以下のように接続設定を行う
-    ```
-    Connection Name: 任意 (dojo_api等)
-    Connection Method: Standard (TCP/IP)
-    Hostname: 127.0.0.1 (localhost)
-    Port: 3306
-    Username: root
-    Password: ca-tech-dojo
-    Default Schema: dojo_api
-
 #### API用のデータベースの接続情報を設定する
 環境変数にデータベースの接続情報を設定します。<br>
-ターミナルのセッション毎に設定したり、.bash_profileで設定を行います。
 
-Macの場合
 ```
 $ export MYSQL_USER=root \
     MYSQL_PASSWORD=ca-tech-dojo \
@@ -93,19 +102,8 @@ $ export MYSQL_USER=root \
     MYSQL_DATABASE=dojo_api
 ```
 
-Windowsの場合<br>
-※ それぞれの環境によって環境変数を設定するコマンドが異なる場合があるので注意
-```
-$ SET MYSQL_USER=root
-$ SET MYSQL_PASSWORD=ca-tech-dojo
-$ SET MYSQL_HOST=127.0.0.1
-$ SET MYSQL_PORT=3306
-$ SET MYSQL_DATABASE=dojo_api
-```
-
 #### Redis
 Redisはインメモリデータベースの1つです。<br>
-必須ではありませんが課題の中ででキャッシュやランキングなどの機能でぜひ利用してみましょう。<br>
 ```
 $ docker-compose up redis
 ```
@@ -119,12 +117,11 @@ $ go run ./cmd/main.go
 ## ローカル環境のAPIを使用したゲームプレイ方法
 自身が開発しているローカルのAPIを使用して、実際にゲームをプレイする方法は二つあります。場合によって使い分けてください。
 
-**どうして二つあるの？**
-今回使用するゲームのクライアントは、このリポジトリには含まれておらず、インターネット上に公開されています。インターネット上に公開されているアプリケーションが公開されている場所以外にアクセスしようとすると、セキュリティ上の問題があるため一部のブラウザではアクセスをブロックする設定になっています。(CORS)
-
+**方法１の詳細：Proxyを挟んだゲームプレイ**</br>
+今回使用しているクライアント側は、このリポジトリには含まれておらず、インターネット上に公開されています。インターネット上に公開されているアプリケーションが公開されている場所以外にアクセスしようとすると、セキュリティ上の問題があるため一部のブラウザではアクセスをブロックする設定になっています。(CORS)
 それを防ぐために、インターネット上にあるものをあたかもローカルに存在するように見せるproxyを用意しました。
 
-### docker-compose up proxyでプレイ
+### 方法１：docker-compose up proxyでプレイ
 Dockerを利用してプレイする方法です。ブラウザに左右されずに動作させることができます。
 
 ```
@@ -138,40 +135,19 @@ $ go run ./cmd/main.go
 [http://localhost:3010/app](http://localhost:3010/app)
 
 ID・パスワードはともに `ca-tech-dojo` です。
-API接続先には `http://localhost:3010` と入力します。(ブラウザ直接利用の場合と異なるので注意！)
+API接続先には `http://localhost:3010` と入力します。
 
-### ブラウザから直接プレイ
-Dockerがうまく動かない場合には直接プレイすることもできます。ただし、ChromeやEdgeは利用できません。
+### 方法２：ローカルを起動し、ブラウザでの直接プレイ
 
-- macOSユーザーの場合: Safari or Firefox
-- Windowsユーザーの場合: Firefox
+- macOSユーザー推奨: Safari or Firefox
+- Windowsユーザー推奨: Firefox
 
 ```
-// APIローカルは起動させる必要があります
+// 注：APIローカルは起動させる必要があります
 $ go run ./cmd/main.go
 ```
-
 ブラウザから下記URLにアクセスしてください。
 [http://13.114.176.9/](http://13.114.176.9/)
 
 ID・パスワードはともに `ca-tech-dojo` です。
 API接続先には `http://localhost:8080` と入力します。(proxy利用の場合と異なるので注意！)
-
-## ビルド方法
-作成したAPIを実際にをサーバ上にデプロイする場合は、<br>
-ビルドされたバイナリファイルを配置して起動することでデプロイを行います。
-### ローカルビルド
-Macの場合
-```
-$ GOOS=linux GOARCH=amd64 go build -o dojo-api ./cmd/main.go
-```
-
-Windowsの場合
-```
-$ SET GOOS=linux
-$ SET GOARCH=amd64
-$ go build -o dojo-api ./cmd/main.go
-```
-
-このコマンドの実行で `dojo-api` という成果物を起動するバイナリファイルが生成されます。<br>
-GOOS,GOARCHで「Linux用のビルド」を指定しています。
